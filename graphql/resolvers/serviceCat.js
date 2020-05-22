@@ -38,7 +38,7 @@ module.exports = {
                     "title": {$regex: new RegExp(title, "i")}
                 });
                 if(serviceCatExist){
-                    throw new Error('ServiceCat already exist')
+                    throw new Error('ServiceCat already exist');
                 }
                 const serviceCats = await ServiceCat.find();
                 const newServiceCat = new ServiceCat({
@@ -53,6 +53,29 @@ module.exports = {
             } catch(err) {
                 throw new Error(err);
             }
+        },
+        async editServiceCat(_, {
+            serviceCatId,
+            serviceCatInput: {
+                title,
+                index
+            }
+        }, context){
+            checkAuth(context);
+            const serviceCatExist = await ServiceCat.findOne({
+                'title': {$regex: new RegExp(title, "i")}
+            });
+            if(serviceCatExist){
+                throw new Error('ServiceCat already exist');
+            }
+            if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
+                const serviceCat = await ServiceCat.findOneAndUpdate(serviceCatId, {
+                    title,
+                    index
+                });
+                serviceCat.populate('createdBy').execPopulate();
+                return serviceCat;
+            } else throw new Error('Invalid ObjectId');
         }
     }
 }
