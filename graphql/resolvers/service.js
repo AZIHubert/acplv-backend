@@ -78,6 +78,7 @@ module.exports = {
             serviceId,
             ServiceInput: {
                 title,
+                index,
                 serviceCatId
             }
         }, context){
@@ -100,6 +101,7 @@ module.exports = {
                 if (serviceId.match(/^[0-9a-fA-F]{24}$/)) {
                     let service = await Service.findByIdAndUpdate(serviceId, {
                         title,
+                        index,
                         serviceCatId
                     });
                     service = await service

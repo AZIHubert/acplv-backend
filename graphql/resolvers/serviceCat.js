@@ -53,6 +53,35 @@ module.exports = {
             } catch(err) {
                 throw new Error(err);
             }
+        },
+        async editServiceCat(_, {
+            serviceCatId,
+            serviceCatInput: {
+                title,
+                index
+            }
+        }, context){
+            checkAuth(context);
+            try {
+                const serviceCatExist = await ServiceCat.findOne({
+                    "title": {$regex: new RegExp(title, "i")}
+                });
+                if(serviceCatExist){
+                    throw new Error('ServiceCat already exist');
+                }
+                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) {
+                    let serviceCat = await ServiceCat.findByIdAndUpdate(serviceCatId, {
+                        title,
+                        index
+                    });
+                    serviceCat = await serviceCat
+                        .populate('createdBy')
+                        .execPopulate();
+                    return serviceCat;
+                } else throw new Error('Invalid ObjectId');
+            } catch(err) {
+                throw new Error(err);
+            }
         }
     }
 }
