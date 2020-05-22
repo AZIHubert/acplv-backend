@@ -126,14 +126,15 @@ module.exports = {
                         const index = service.index;
                         await service.delete();
                         await Service.updateMany({
-                            serviceCat
-                        },{
-                            index: {$gte: index}
+                            $and: [
+                                {serviceCat},
+                                {index: {$gte: index}}
+                            ]
                         }, {
                             $inc: {index: -1}
                         });
+                        return 'Service deleted successfully';
                     } else throw new Error('Service not found');
-                    return 'Service deleted successfully';
                 } else throw new Error('Invalid ObjectId');
             } catch (err) {
                 throw new Error(err);
