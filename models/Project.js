@@ -13,7 +13,10 @@ const projectSchema = new Schema({
     },
     username: String,
     createdAt: String,
-    thumbnail: String
+    thumbnailUrl: {
+        type: Schema.Types.ObjectId,
+        ref: 'image'
+    }
 });
 
 module.exports = model('Project', projectSchema);

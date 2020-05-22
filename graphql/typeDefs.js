@@ -3,19 +3,69 @@ const {
 } = require('apollo-server');
 
 module.exports = gql`
+    type Project {
+        _id: ID!
+        title: String!
+        index: Int!
+        display: Boolean!
+        type: ID!
+        username: ID!
+        createdAt: String!
+        thumbnailUrl: ID!
+    }
+    type Type {
+        _id: ID!
+        title: String
+    }
+    type ServiceCat {
+        _id: ID!
+        title: String!
+        index: Int!
+        createdBy: User!
+        createdAt: String!
+    }
     type Service {
         _id: ID!
         title: String!
         index: Int!
+        createdAt: String!
+        createdBy: User!
         serviceCat: ID
     }
+    type File {
+        filename: String!
+        mimetype: String!
+        encoding: String!
+    }
     type User {
+        _id: ID!
+        email: String!
+        createdAt: String!
+        username: String!
+    }
+    type CurrentUser {
         _id: ID!
         email: String!
         token: String!
         username: String!
         isActive: Boolean!
         createdAt: String!
+    }
+    input ProjectInput {
+        title: String!
+        index: Int!
+        display: Boolean!
+        type: ID!
+        file: FileInput
+    }
+    input ServiceInput {
+        title: String!
+        serviceCatId: ID
+    }
+    input FileInput {
+        filename: String!
+        mimetype: String!
+        encoding: String!
     }
     input RegisterInput {
         username: String!
@@ -25,10 +75,23 @@ module.exports = gql`
         registerConfirmation: String!
     }
     type Query {
-        getServices: [Service!]!
+        # getProjects: [Project]!
+        # getProject(projectId: String!): Project
+        getServiceCats: [ServiceCat]!
+        getServiceCat(serviceCatId: ID!): ServiceCat!
+        getServices: [Service]!
+        getService(serviceId: ID!): Service!
     }
     type Mutation {
-        register(registerInput: RegisterInput): User!
-        login(emailOrUsername: String!, password: String): User!
+        # createProject(projectInput: ProjectInput): Project!
+        # deleteProject(projectId: Id!): String!
+        createServiceCat(title: String!): ServiceCat!
+        createService(serviceInput: ServiceInput!): Service!
+        editService(serviceId: ID!, serviceInput: ServiceInput!): Service!
+        deleteService(serviceId: ID!): String!
+        register(registerInput: RegisterInput!): CurrentUser!
+        login(emailOrUsername: String!, password: String!): CurrentUser!
+        # logout(): String!
+        # deleteAccount(): String!
     }
 `;

@@ -11,8 +11,8 @@ const { SECRET_KEY } = require('../../config');
 const User = require('../../models/User');
 
 const generateToken = user => jwt.sign({
-    id: user.id,
-    email: user.username,
+    _id: user.id,
+    email: user.email,
     username: user.username,
     isActive: user.isActive,
 }, SECRET_KEY, {
@@ -112,6 +112,12 @@ module.exports = {
                 _id: user._id,
                 token
             }
-        }
+        },
+        // async logout(){
+
+        // },
+        // async deleteAccount(){
+
+        // }
     }
 }
