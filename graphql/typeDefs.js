@@ -71,6 +71,10 @@ module.exports = gql`
         index: Int!
         serviceCatId: ID
     }
+    input ServiceCatInput {
+        title: String!
+        index: Int!
+    }
     input FileInput {
         filename: String!
         mimetype: String!
@@ -95,9 +99,10 @@ module.exports = gql`
         # createProject(projectInput: ProjectInput): Project!
         # deleteProject(projectId: Id!): String!
         createServiceCat(title: String!): ServiceCat!
-        editServiceCat(serviceCatId: ID!, serviceCatInput: ServiceCatInput): ServiceCat!
-        createService(serviceInput: CreateServiceInput!): Service!
-        editService(serviceId: ID!, serviceInput: EditServiceInput!): Service!
+        editServiceCat(serviceCatId: ID!, serviceCatInput: ServiceCatInput!): ServiceCat!
+        deleteServiceCat(serviceCatId: ID!): String!
+        createService(serviceInput: ServiceInput!): Service!
+        editService(serviceId: ID!, serviceInput: ServiceInput!): Service!
         deleteService(serviceId: ID!): String!
         register(registerInput: RegisterInput!): CurrentUser!
         login(emailOrUsername: String!, password: String!): CurrentUser!
