@@ -1,13 +1,19 @@
 const ServiceCat = require('../../models/ServiceCat');
+const Service =  require('../../models/Service');
 const checkAuth = require('../../util/checkAuth');
+const {userGetter} = require('../../util/populate');
 
 module.exports = {
     Query: {
         async getServiceCats(){
             try{
-                const serviceCats = await ServiceCat.find()
-                    .sort({index: 1})
-                    .populate('createdBy');
+                let serviceCats = await ServiceCat.find()
+                    .sort({index: 1});
+                serviceCats = serviceCats.map(serviceCat => ({
+                    ...serviceCat._doc,
+                    _id: serviceCat._id,
+                    createdBy: userGetter(serviceCat.createdBy)
+                }));
                 return serviceCats;
             } catch(err) {
                 throw new Error(err);
@@ -18,9 +24,15 @@ module.exports = {
         }){
             try{
                 if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const serviceCat = await ServiceCat.findById(serviceCatId)
-                        .populate('createdBy');
-                    if(serviceCat) return serviceCat;
+                    let serviceCat = await ServiceCat.findById(serviceCatId);
+                    if(serviceCat) {
+                        serviceCat = {
+                            ...serviceCat._doc,
+                            _id: serviceCat._id,
+                            createdBy: userGetter(serviceCat.createdBy)
+                        };
+                        return serviceCat;
+                    }
                     else throw new Error('ServiceCat not found');
                 } else throw new Error('Invalid ObjectId');
             } catch(err) {
@@ -48,7 +60,11 @@ module.exports = {
                     createdBy: user._id
                 });
                 let serviceCat = await newServiceCat.save();
-                serviceCat = await serviceCat.populate('createdBy').execPopulate();
+                serviceCat = {
+                    ...serviceCat._doc,
+                    _id: serviceCat._id,
+                    createdBy: userGetter(serviceCat.createdBy)
+                }
                 return serviceCat;
             } catch(err) {
                 throw new Error(err);
@@ -60,6 +76,10 @@ module.exports = {
         }, context){
             checkAuth(context);
             try {
+                const serviceCat = await ServiceCat.findById(serviceCatId);
+                if(!serviceCat){
+                    throw new Error('ServiceCat not found');
+                }
                 const serviceCatExist = await ServiceCat.findOne({
                     $and: [
                         {"title": {$regex: new RegExp(title, "i")}},
@@ -70,14 +90,15 @@ module.exports = {
                     throw new Error('ServiceCat already exist');
                 }
                 if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const serviceCat = await ServiceCat.findById(serviceCatId);
                     if(title !== serviceCat.title){
                         let serviceCatEdited = await ServiceCat.findByIdAndUpdate(serviceCatId, {
                             title
                         }, {new: true});
-                        serviceCatEdited = await serviceCatEdited
-                            .populate('createdBy')
-                            .execPopulate();
+                        serviceCatEdited = {
+                            ...serviceCatEdited._doc,
+                            _id: serviceCatEdited._id,
+                            createdBy: userGetter(serviceCatEdited.createdBy)
+                        }
                         return serviceCatEdited;
                     } else throw new Error('ServiceCat has not changed');
                 } else throw new Error('Invalid ObjectId');
@@ -99,6 +120,11 @@ module.exports = {
                             index: {$gte: index}
                         }, {
                             $inc: {index: -1}
+                        });
+                        await Service.updateMany({
+                            serviceCat: { $eq: serviceCatId }
+                        }, {
+                            $set: {serviceCat: null}
                         });
                     } else throw new Error('ServiceCat not found');
                     return 'ServiceCat deleted successfully';

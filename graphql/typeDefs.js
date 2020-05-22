@@ -30,7 +30,7 @@ module.exports = gql`
         index: Int!
         createdAt: String!
         createdBy: User!
-        serviceCat: ID
+        serviceCat: ServiceCat
     }
     type File {
         filename: String!
@@ -58,13 +58,8 @@ module.exports = gql`
         type: ID!
         file: FileInput
     }
-    input CreateServiceInput {
+    input ServiceInput {
         title: String!
-        serviceCatId: ID
-    }
-    input EditServiceInput {
-        title: String!
-        index: Int!
         serviceCatId: ID
     }
     input FileInput {
@@ -85,6 +80,7 @@ module.exports = gql`
         getServiceCats: [ServiceCat]!
         getServiceCat(serviceCatId: ID!): ServiceCat!
         getServices: [Service]!
+        getServicesByCat(serviceCatId: ID!): [Service]!
         getService(serviceId: ID!): Service!
     }
     type Mutation {
@@ -93,8 +89,8 @@ module.exports = gql`
         createServiceCat(title: String!): ServiceCat!
         editServiceCat(serviceCatId: ID!, title: String!): ServiceCat!
         deleteServiceCat(serviceCatId: ID!): String!
-        createService(serviceInput: CreateServiceInput!): Service!
-        editService(serviceId: ID!, serviceInput: EditServiceInput!): Service!
+        createService(serviceInput: ServiceInput!): Service!
+        editService(serviceId: ID!, serviceInput: ServiceInput!): Service!
         deleteService(serviceId: ID!): String!
         register(registerInput: RegisterInput!): CurrentUser!
         login(emailOrUsername: String!, password: String!): CurrentUser!
