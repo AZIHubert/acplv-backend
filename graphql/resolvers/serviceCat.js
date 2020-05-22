@@ -62,20 +62,46 @@ module.exports = {
             }
         }, context){
             checkAuth(context);
-            const serviceCatExist = await ServiceCat.findOne({
-                'title': {$regex: new RegExp(title, "i")}
-            });
-            if(serviceCatExist){
-                throw new Error('ServiceCat already exist');
-            }
-            if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                const serviceCat = await ServiceCat.findOneAndUpdate(serviceCatId, {
-                    title,
-                    index
+            try {
+                const serviceCatExist = await ServiceCat.findOne({
+                    'title': {$regex: new RegExp(title, "i")}
                 });
-                serviceCat.populate('createdBy').execPopulate();
-                return serviceCat;
-            } else throw new Error('Invalid ObjectId');
+                if(serviceCatExist){
+                    throw new Error('ServiceCat already exist');
+                }
+                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
+                    const serviceCat = await ServiceCat.findOneAndUpdate(serviceCatId, {
+                        title,
+                        index
+                    });
+                    serviceCat.populate('createdBy').execPopulate();
+                    return serviceCat;
+                } else throw new Error('Invalid ObjectId');
+            } catch(err) {
+                throw new Error(err);
+            }
+        },
+        async deleteServiceCat(_, {
+            serviceCatId
+        }, context){
+            checkAuth(context);
+            try {
+                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
+                    const serviceCat = await ServiceCat.find(serviceCatId);
+                    if(serviceCat){
+                        const index = serviceCat.index;
+                        await serviceCat.delete();
+                        await Service.updateMany({
+                            index: {$gte: index}
+                        }, {
+                            $inc: {index: -1}
+                        });
+                    } else throw new Error('ServiceCat not found');
+                    return 'ServiceCat deleted successfully';
+                } else throw new Error('Invalid ObjectId');
+            } catch (err) {
+                throw new Error(err);
+            }
         }
     }
 }

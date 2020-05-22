@@ -91,6 +91,7 @@ module.exports = gql`
         # deleteProject(projectId: Id!): String!
         createServiceCat(title: String!): ServiceCat!
         editServiceCat(serviceCatId: ID!, serviceCatInput: ServiceCatInput!): ServiceCat!
+        deleteServiceCat(serviceCatId: ID!): String!
         createService(serviceInput: ServiceInput!): Service!
         editService(serviceId: ID!, serviceInput: ServiceInput!): Service!
         deleteService(serviceId: ID!): String!
