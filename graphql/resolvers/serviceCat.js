@@ -34,7 +34,7 @@ module.exports = {
         }, context){
             const user = checkAuth(context);
             try{
-                const serviceCatExist = await ServiceCat.find({
+                const serviceCatExist = await ServiceCat.findOne({
                     "title": {$regex: new RegExp(title, "i")}
                 });
                 if(serviceCatExist){
@@ -56,28 +56,30 @@ module.exports = {
         },
         async editServiceCat(_, {
             serviceCatId,
-            serviceCatInput: {
-                title,
-                index
-            }
+            title
         }, context){
             checkAuth(context);
             try {
                 const serviceCatExist = await ServiceCat.findOne({
-                    "title": {$regex: new RegExp(title, "i")}
+                    $and: [
+                        {"title": {$regex: new RegExp(title, "i")}},
+                        {"_id": {$ne: serviceCatId}}
+                    ]
                 });
                 if(serviceCatExist){
                     throw new Error('ServiceCat already exist');
                 }
-                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) {
-                    let serviceCat = await ServiceCat.findByIdAndUpdate(serviceCatId, {
-                        title,
-                        index
-                    });
-                    serviceCat = await serviceCat
-                        .populate('createdBy')
-                        .execPopulate();
-                    return serviceCat;
+                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
+                    const serviceCat = await ServiceCat.findById(serviceCatId);
+                    if(title !== serviceCat.title){
+                        let serviceCatEdited = await ServiceCat.findByIdAndUpdate(serviceCatId, {
+                            title
+                        }, {new: true});
+                        serviceCatEdited = await serviceCatEdited
+                            .populate('createdBy')
+                            .execPopulate();
+                        return serviceCatEdited;
+                    } else throw new Error('ServiceCat has not changed');
                 } else throw new Error('Invalid ObjectId');
             } catch(err) {
                 throw new Error(err);
@@ -89,11 +91,11 @@ module.exports = {
             checkAuth(context);
             try {
                 if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const serviceCat = await ServiceCat.find(serviceCatId);
+                    const serviceCat = await ServiceCat.findById(serviceCatId);
                     if(serviceCat){
                         const index = serviceCat.index;
                         await serviceCat.delete();
-                        await Service.updateMany({
+                        await ServiceCat.updateMany({
                             index: {$gte: index}
                         }, {
                             $inc: {index: -1}
