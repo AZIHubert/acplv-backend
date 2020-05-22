@@ -1,7 +1,7 @@
 const ServiceCat = require('../../models/ServiceCat');
 const Service =  require('../../models/Service');
 const checkAuth = require('../../util/checkAuth');
-const {userGetter} = require('../../util/populate');
+const {userGetter} = require('../../util/merge');
 
 module.exports = {
     Query: {

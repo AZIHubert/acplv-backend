@@ -1,7 +1,7 @@
 const Service = require('../../models/Service');
 const ServiceCat = require('../../models/ServiceCat');
 const checkAuth = require('../../util/checkAuth');
-const {serviceCatGetter, userGetter} = require('../../util/populate');
+const {serviceCatGetter, userGetter} = require('../../util/merge');
 
 module.exports = {
     Query: {
@@ -39,7 +39,7 @@ module.exports = {
                         console.log(services)
                         return services;
                     } else throw new Error('serviceCat not found');
-                } else throw new Error('Invalid serviceCat ObjectId');
+                } else throw new Error('Invalid ObjectId');
             } catch(err) {
                 throw new Error(err);
             }

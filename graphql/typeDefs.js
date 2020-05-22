@@ -8,20 +8,27 @@ module.exports = gql`
         title: String!
         index: Int!
         display: Boolean!
-        type: ID!
-        username: ID!
+        type: Type
+        username: ID
         createdAt: String!
-        thumbnailUrl: ID!
+        thumbnailUrl: Image
     }
     type Type {
         _id: ID!
         title: String
     }
+    type Client {
+        _id: ID!
+        title: String!
+        index: Int!
+        createdAt: String!
+        createdBy: User
+    }
     type ServiceCat {
         _id: ID!
         title: String!
         index: Int!
-        createdBy: User!
+        createdBy: User
         createdAt: String!
     }
     type Service {
@@ -29,13 +36,17 @@ module.exports = gql`
         title: String!
         index: Int!
         createdAt: String!
-        createdBy: User!
+        createdBy: User
         serviceCat: ServiceCat
     }
-    type File {
+    type Image {
+        _id: ID!
         filename: String!
-        mimetype: String!
-        encoding: String!
+        format: String!
+        folder: String!
+        url: String!
+        uploadAt: String!
+        uploadBy: User!
     }
     type User {
         _id: ID!
@@ -51,21 +62,9 @@ module.exports = gql`
         isActive: Boolean!
         createdAt: String!
     }
-    input ProjectInput {
-        title: String!
-        index: Int!
-        display: Boolean!
-        type: ID!
-        file: FileInput
-    }
     input ServiceInput {
         title: String!
         serviceCatId: ID
-    }
-    input FileInput {
-        filename: String!
-        mimetype: String!
-        encoding: String!
     }
     input RegisterInput {
         username: String!
@@ -77,6 +76,12 @@ module.exports = gql`
     type Query {
         # getProjects: [Project]!
         # getProject(projectId: String!): Project
+        # getTypes: [Type]!
+        # getType(typeId: ID!): Type!
+        getImages: [Image]!
+        getImage(imageId: ID!): Image!
+        getClients: [Client]!
+        getClient(clientId: ID!): Client!
         getServiceCats: [ServiceCat]!
         getServiceCat(serviceCatId: ID!): ServiceCat!
         getServices: [Service]!
@@ -84,8 +89,17 @@ module.exports = gql`
         getService(serviceId: ID!): Service!
     }
     type Mutation {
-        # createProject(projectInput: ProjectInput): Project!
+        # createType(title: String): Type!
+        # editType(typeId: ID!, title: String): Type!
+        # deleteType(typeId: ID!): String!
+        # createProject(projectInput: ProjectInput!): Project!
+        # editProject(projectId: ID!, projectInput: ProjectInput!): Project!
         # deleteProject(projectId: Id!): String!
+        uploadImage(imageFile: Upload!, folder: String!): Image!
+        deleteImage(imageId: ID): String!
+        createClient(title: String): Client!
+        editClient(clientId: ID!, title: String): Client!
+        deleteClient(clientId: ID!): String!
         createServiceCat(title: String!): ServiceCat!
         editServiceCat(serviceCatId: ID!, title: String!): ServiceCat!
         deleteServiceCat(serviceCatId: ID!): String!
@@ -94,7 +108,10 @@ module.exports = gql`
         deleteService(serviceId: ID!): String!
         register(registerInput: RegisterInput!): CurrentUser!
         login(emailOrUsername: String!, password: String!): CurrentUser!
+        # editUser(userInput: userInput): User!
         # logout(): String!
         # deleteAccount(): String!
     }
 `;
+
+// TODO: Change type Image by Thumbnail (to create specific route to upload image)
