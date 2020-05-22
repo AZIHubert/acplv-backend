@@ -40,11 +40,11 @@ module.exports = {
         }, context){
                 const user = checkAuth(context);
                 try {
-                    const serviceExist = Service.find({
-                        "title": {$regex: new RegExp(title, i)}
+                    const serviceExist = await Service.find({
+                        "title": {$regex: new RegExp(title, "i")}
                     });
                     if(serviceExist){
-                        throw new Error('Service already exist')
+                        throw new Error('Service already exist');
                     }
                     if (serviceCatId !== undefined){
                         if(serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
@@ -83,8 +83,8 @@ module.exports = {
         }, context){
             checkAuth(context);
             try{
-                const serviceExist = Service.find({
-                    "title": {$regex: new RegExp(title, i)}
+                const serviceExist = await Service.find({
+                    "title": {$regex: new RegExp(title, "i")}
                 });
                 if(serviceExist){
                     throw new Error('Service already exist')
@@ -120,9 +120,12 @@ module.exports = {
                 if (serviceId.match(/^[0-9a-fA-F]{24}$/)) {
                     const service = await Service.findById(serviceId);
                     if(service) {
+                        let serviceCat = service.serviceCat;
                         const index = service.index;
                         await service.delete();
                         await Service.updateMany({
+                            serviceCat
+                        },{
                             index: {$gte: index}
                         }, {
                             $inc: {index: -1}
