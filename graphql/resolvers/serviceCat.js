@@ -34,8 +34,8 @@ module.exports = {
         }, context){
             const user = checkAuth(context);
             try{
-                const serviceCatExist = ServiceCat.find({
-                    "title": {$regex: new RegExp(title, i)}
+                const serviceCatExist = await ServiceCat.find({
+                    "title": {$regex: new RegExp(title, "i")}
                 });
                 if(serviceCatExist){
                     throw new Error('ServiceCat already exist')
