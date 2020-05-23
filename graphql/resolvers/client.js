@@ -43,6 +43,7 @@ module.exports = {
         }, context){
             const user = checkAuth(context);
             try {
+                if(title.trim() === '') throw new Error('Can\'t be empty');
                 const clientExist = await Client.findOne({
                     "title": {$regex: new RegExp(title, "i")}
                 });
@@ -56,7 +57,6 @@ module.exports = {
                     createdAt: new Date().toISOString(),
                     createdBy: user._id
                 });
-                console.log(new Date().toISOString());
                 let client = await newClient.save();
                 client = {
                     ...client._doc,

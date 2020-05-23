@@ -3,6 +3,8 @@ const DataLoader = require('dataloader');
 const User = require('../models/User');
 const Service = require('../models/Service');
 const ServiceCat = require('../models/ServiceCat');
+const Project = require('../models/Project');
+const Type = require('../models/Type');
 
 // User //
 const userGetter = async function(userIds){
@@ -78,19 +80,83 @@ const services = async serviceIds => {
     }
 };
 
+// Project //
+const projectsGetter = async function(projectsId){
+    if(!!projectsId.length)
+        return await projectLoader.loadMany(projectsId);
+    else return [];
+};
+const projectLoader = new DataLoader(projectsId => services(projectsId));
+const projects = async projectsId => {
+    try {
+        projectsId = projectsId.map(projectId => Project.findById(projectId));
+        let projects = await Promise.all(projectsId);
+        projects = projects.map(project => {
+            return {
+                ...project._doc,
+                _id: project._id,
+                createdBy: () => userGetter(project.createdBy),
+                type: () => projectsGetter(project.type)
+            }
+        }).sort((a, b) => a.index - b.index);
+        return projects;
+    } catch(err) {
+        throw new Error(err);
+    }
+};
+
+// Type //
+const typeGetter = async function(typeId){
+    if(typeId)
+        return await typeLoader.load(typeId);
+    else return null;
+};
+const typeLoader = new DataLoader(typeIds => type(typeIds));
+const type = async typeIds => {
+    try {
+        typeIds = typeIds.map(typeId => Type.findById(typeId));
+        let types = await Promise.all(typeIds);
+        types = types.map(type => {
+            return {
+                ...type._doc,
+                _id: type._id,
+                createdBy: () => userGetter(type.createdBy),
+                projects: () => projectsGetter(type.projects)
+            }
+        });
+        return types;
+    } catch(err) {
+        throw new Error(err);
+    }
+};
+
 const transformService = service => ({
     ...service._doc,
     _id: service._id,
     createdBy: () => userGetter(service.createdBy),
-    serviceCat: () =>serviceCatGetter(service.serviceCat)
+    serviceCat: () => serviceCatGetter(service.serviceCat)
 });
 const transformServiceCat = serviceCat => ({
     ...serviceCat._doc,
     _id: serviceCat._id,
     createdBy: () => userGetter(serviceCat.createdBy),
     services: () => servicesGetter(serviceCat.services)
+});
+const transformProject = project => ({
+    ...project._doc,
+    _id: project._id,
+    createdBy: () => userGetter(project.createdBy),
+    type: () => typeGetter(project.type)
+});
+const transformType = type => ({
+    ...type._doc,
+    _id: type._id,
+    createdBy: () => userGetter(type.createdBy),
+    projects: () => projectsGetter(type.projects)
 })
 
 module.exports.userGetter = userGetter;
 module.exports.transformService = transformService;
 module.exports.transformServiceCat = transformServiceCat;
+module.exports.transformProject = transformProject;
+module.exports.transformType = transformType;

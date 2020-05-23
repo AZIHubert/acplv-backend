@@ -15,7 +15,10 @@ module.exports = gql`
     }
     type Type {
         _id: ID!
-        title: String
+        title: String!
+        createdAt: String!
+        createdBy: User!
+        projects: [Project]!
     }
     type Client {
         _id: ID!
@@ -72,9 +75,9 @@ module.exports = gql`
     }
     type Query {
         # getProjects: [Project]!
-        # getProject(projectId: String!): Project
-        # getTypes: [Type]!
-        # getType(typeId: ID!): Type!
+        # getProject(projectId: String!): Project!
+        getTypes: [Type]!
+        getType(typeId: ID!): Type!
         getImages: [Image]!
         getImage(imageId: ID!): Image!
         getClients: [Client]!
@@ -86,12 +89,12 @@ module.exports = gql`
         getService(serviceId: ID!): Service!
     }
     type Mutation {
-        # createType(title: String): Type!
-        # editType(typeId: ID!, title: String): Type!
-        # deleteType(typeId: ID!): String!
         # createProject(projectInput: ProjectInput!): Project!
         # editProject(projectId: ID!, projectInput: ProjectInput!): Project!
         # deleteProject(projectId: Id!): String!
+        createType(title: String!): Type!
+        editType(typeId: ID!, title: String!): Type!
+        deleteType(typeId: ID!): String!
         uploadImage(imageFile: Upload!, type: String): Image!
         deleteImage(imageId: ID): String!
         createClient(title: String): Client!
