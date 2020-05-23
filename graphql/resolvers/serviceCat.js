@@ -1,7 +1,7 @@
 const ServiceCat = require('../../models/ServiceCat');
 const Service =  require('../../models/Service');
 const checkAuth = require('../../util/checkAuth');
-const {userGetter} = require('../../util/merge');
+const {userGetter, servicesGetter, transformServiceCat} = require('../../util/merge');
 
 module.exports = {
     Query: {
@@ -9,11 +9,7 @@ module.exports = {
             try{
                 let serviceCats = await ServiceCat.find()
                     .sort({index: 1});
-                serviceCats = serviceCats.map(serviceCat => ({
-                    ...serviceCat._doc,
-                    _id: serviceCat._id,
-                    createdBy: userGetter(serviceCat.createdBy)
-                }));
+                serviceCats = serviceCats.map(serviceCat => transformServiceCat(serviceCat));
                 return serviceCats;
             } catch(err) {
                 throw new Error(err);
@@ -26,12 +22,7 @@ module.exports = {
                 if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
                     let serviceCat = await ServiceCat.findById(serviceCatId);
                     if(serviceCat) {
-                        serviceCat = {
-                            ...serviceCat._doc,
-                            _id: serviceCat._id,
-                            createdBy: userGetter(serviceCat.createdBy)
-                        };
-                        return serviceCat;
+                        return transformServiceCat(serviceCat);
                     }
                     else throw new Error('ServiceCat not found');
                 } else throw new Error('Invalid ObjectId');
@@ -57,15 +48,11 @@ module.exports = {
                     title,
                     index: serviceCats.length,
                     createdAt: new Date().toISOString(),
-                    createdBy: user._id
+                    createdBy: user._id,
+                    services: []
                 });
                 let serviceCat = await newServiceCat.save();
-                serviceCat = {
-                    ...serviceCat._doc,
-                    _id: serviceCat._id,
-                    createdBy: userGetter(serviceCat.createdBy)
-                }
-                return serviceCat;
+                return transformServiceCat(serviceCat);
             } catch(err) {
                 throw new Error(err);
             }
@@ -94,14 +81,44 @@ module.exports = {
                         let serviceCatEdited = await ServiceCat.findByIdAndUpdate(serviceCatId, {
                             title
                         }, {new: true});
-                        serviceCatEdited = {
-                            ...serviceCatEdited._doc,
-                            _id: serviceCatEdited._id,
-                            createdBy: userGetter(serviceCatEdited.createdBy)
-                        }
-                        return serviceCatEdited;
+                        return transformServiceCat(serviceCatEdited);
                     } else throw new Error('ServiceCat has not changed');
                 } else throw new Error('Invalid ObjectId');
+            } catch(err) {
+                throw new Error(err);
+            }
+        },
+        async moveServiceCat(_, {
+            serviceCatId,
+            index
+        }, context){
+            checkAuth(context);
+            try{
+                if (!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid serviceCat ObjectId');
+                const serviceCats = await ServiceCat.find();
+                let serviceCat = await ServiceCat.findById(serviceCatId);
+                if(!serviceCat) throw new Error('ServiceCat not found');
+                if(index < 0 || index > serviceCats.length) throw new Error('Index out of range');
+                let oldIndex = serviceCat.index;
+                serviceCat.index = index;
+                await ServiceCat.updateMany({
+                    $and: [
+                        {_id: {$ne: serviceCatId}},
+                        {index: {$gte: oldIndex}}
+                    ]
+                }, {
+                    $inc: {index: -1}
+                });
+                await ServiceCat.updateMany({
+                    $and: [
+                        {_id: {$ne: serviceCatId}},
+                        {index: {$gte: index}}
+                    ]
+                }, {
+                    $inc: {index: 1}
+                });
+                await service.save();
+                return 'ServiceCat successfully moved';
             } catch(err) {
                 throw new Error(err);
             }

@@ -30,6 +30,7 @@ module.exports = gql`
         index: Int!
         createdBy: User
         createdAt: String!
+        services: [Service]!
     }
     type Service {
         _id: ID!
@@ -43,7 +44,7 @@ module.exports = gql`
         _id: ID!
         filename: String!
         format: String!
-        folder: String!
+        type: String!
         url: String!
         uploadAt: String!
         uploadBy: User!
@@ -61,10 +62,6 @@ module.exports = gql`
         username: String!
         isActive: Boolean!
         createdAt: String!
-    }
-    input ServiceInput {
-        title: String!
-        serviceCatId: ID
     }
     input RegisterInput {
         username: String!
@@ -95,16 +92,19 @@ module.exports = gql`
         # createProject(projectInput: ProjectInput!): Project!
         # editProject(projectId: ID!, projectInput: ProjectInput!): Project!
         # deleteProject(projectId: Id!): String!
-        uploadImage(imageFile: Upload!, folder: String!): Image!
+        uploadImage(imageFile: Upload!, type: String): Image!
         deleteImage(imageId: ID): String!
         createClient(title: String): Client!
         editClient(clientId: ID!, title: String): Client!
+        moveClient(clientId: ID!, index: Int!): String!
         deleteClient(clientId: ID!): String!
         createServiceCat(title: String!): ServiceCat!
         editServiceCat(serviceCatId: ID!, title: String!): ServiceCat!
+        moveServiceCat(serviceCatId: ID!, index: Int!): String!
         deleteServiceCat(serviceCatId: ID!): String!
-        createService(serviceInput: ServiceInput!): Service!
-        editService(serviceId: ID!, serviceInput: ServiceInput!): Service!
+        createService(title: String! serviceCatId: ID): Service!
+        editService(serviceId: ID!, title: String!): Service!
+        moveService(serviceId: ID! index: Int! serviceCatId: ID): String!
         deleteService(serviceId: ID!): String!
         register(registerInput: RegisterInput!): CurrentUser!
         login(emailOrUsername: String!, password: String!): CurrentUser!

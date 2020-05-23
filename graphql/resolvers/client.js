@@ -104,6 +104,41 @@ module.exports = {
                 throw new Error(err);
             }
         },
+        async moveClient(_, {
+            clientId,
+            index
+        }, context){
+            checkAuth(context);
+            try{
+                if (!clientId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                const clients = await Client.find();
+                let client = await Client.findById(clientId);
+                if(!client) throw new Error('Client not found');
+                if(index < 0 || index > clients.length) throw new Error('Index out of range');
+                let oldIndex = client.index;
+                client.index = index;
+                await Client.updateMany({
+                    $and: [
+                        {_id: {$ne: clientId}},
+                        {index: {$gte: oldIndex}}
+                    ]
+                }, {
+                    $inc: {index: -1}
+                });
+                await Client.updateMany({
+                    $and: [
+                        {_id: {$ne: clientId}},
+                        {index: {$gte: index}}
+                    ]
+                }, {
+                    $inc: {index: 1}
+                });
+                await client.save();
+                return 'Client move successfully'
+            } catch (err) {
+                throw new Error(err);
+            }
+        },
         async deleteClient(_, {
             clientId
         }, context){

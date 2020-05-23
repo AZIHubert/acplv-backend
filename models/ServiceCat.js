@@ -11,7 +11,11 @@ const serviceCat = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    createdAt: String
+    createdAt: String,
+    services: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Service'
+    }]
 });
 
 module.exports = model('ServiceCat', serviceCat);
