@@ -1,4 +1,5 @@
 const Image = require('../../models/Image');
+const Project = require('../../models/Project');
 const checkAuth = require('../../util/checkAuth');
 const cloudinary = require('cloudinary').v2;
 const {userGetter} = require('../../util/merge');
@@ -20,7 +21,7 @@ module.exports = {
     Query: {
         async getImages(){
             try{
-                const images = Image.fing();
+                const images = await Image.find();
                 images = images.map(image => ({
                     ...image._doc,
                     _id: image._id,
@@ -35,17 +36,15 @@ module.exports = {
             imageId
         }){
             try{
-                if (imageId.match(/^[0-9a-fA-F]{24}$/)) {
-                    let image = await Image.findById(imageId);
-                    if(imageId) {
-                        image = {
-                            ...image._doc,
-                            _id: image._id,
-                            uploadBy: userGetter(image.uploadBy)
-                        }
-                        return image;
-                    } else throw new Error('Image not found');
-                } else throw new Error('Invalid ObjectId');
+                if (!imageId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                let image = await Image.findById(imageId);
+                if(imageId) throw new Error('Image not found');
+                image = {
+                    ...image._doc,
+                    _id: image._id,
+                    uploadBy: userGetter(image.uploadBy)
+                }
+                return image;
             } catch(err) {
                 throw new Error(err);
             }
@@ -58,11 +57,11 @@ module.exports = {
         }, context){
             const user = checkAuth(context);
             try {
-                const {createReadStream, mimetype} = await imageFile;
                 if(mimetype !== 'image/jpeg' || mimetype !== 'image/png')
                     throw new Error('Must be a valid image (.jpg/.jpeg/.png)');
-                if(type !== 'thumbnail' || type !== 'logo' || type !== 'general')
-                    throw new Error('Wrong type (need to be \\thumbnail/logo/general\\)');
+                if(type !== 'thumbnail' || type !== 'logo' || type !== 'headerImage' || type !== 'favicon')
+                    throw new Error('Wrong type (need to be \\thumbnail/logo/favicon/headerImage\\)');
+                const {createReadStream, mimetype} = await imageFile;
                 const fileStream = createReadStream();
                 const file = await new Promise((resolve, reject) => {
                     const cloudStream = cloudinary.uploader
@@ -101,7 +100,11 @@ module.exports = {
         }, contex){
             checkAuth(contex);
             try{
+                if (!imageId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
                 const image = await Image.findById(imageId);
+                if(!image) throw new Error('Image not found');
+                const imageId = image._id;
+                const imageType = image.type;
                 // TODO: Maybe add folder/filename but in this case, what about upload preset folder ?
                 await cloudinary.uploader.destroy(image.filename, err => {
                     if(err){
@@ -109,9 +112,22 @@ module.exports = {
                     }
                 });
                 await image.delete();
-                // TODO: find projects with this image and set image to null
-                //       find logo or favicon and set to null
-                //       find header image and set to null if type = ''
+                if(imageType === "project"){
+                    await Project.updateMany({
+                        thumbnail: {$eq: imageId}
+                    }, {
+                        thumbnail: null
+                    });
+                }
+                if(imageType === "logo"){
+
+                }
+                if(imageType === "favicon"){
+
+                }
+                if(imageType === "headerImage"){
+
+                }
                 return 'Image deleted successfully';
             } catch(err) {
                 throw new Error(err);

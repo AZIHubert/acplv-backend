@@ -8,8 +8,7 @@ module.exports = {
     Query: {
         async getServices(){
             try{
-                let services = await Service.find()
-                    .sort({index: 1});
+                let services = await Service.find().sort({index: 1});
                 services = services.map(service => transformService(service));
                 return services;
             } catch(err) {
@@ -20,16 +19,14 @@ module.exports = {
             serviceCatId
         }){
             try{
-                if(serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const servicesCat = await ServiceCat.findById(serviceCatId);
-                    if(servicesCat){
-                        let services = await Service.find({
-                            serviceCat: serviceCatId
-                        }).sort({index: 1});
-                        services = services.map(service => transformService(service));
-                        return services;
-                    } else throw new Error('serviceCat not found');
-                } else throw new Error('Invalid ObjectId');
+                if(!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                const servicesCat = await ServiceCat.findById(serviceCatId);
+                if(!servicesCat) throw new Error('serviceCat not found');
+                let services = await Service.find({
+                    serviceCat: serviceCatId
+                }).sort({index: 1});
+                services = services.map(service => transformService(service));
+                return services;
             } catch(err) {
                 throw new Error(err);
             }
@@ -38,13 +35,10 @@ module.exports = {
             serviceId
         }){
             try{
-                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) {
-                    let service = await Service.findById(serviceId);
-                    if(service) {
-                        return transformService(service);
-                    }
-                    else throw new Error('Service not found');
-                } else throw new Error('Invalid ObjectId');
+                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                let service = await Service.findById(serviceId);
+                if(service) throw new Error('Service not found');
+                return transformService(service);
             } catch (err) {
                 throw new Error(err);
             }
@@ -61,31 +55,26 @@ module.exports = {
                     const serviceExist = await Service.findOne({
                         "title": {$regex: new RegExp(title, "i")}
                     });
-                    if(serviceExist){
-                        throw new Error('Service already exist');
-                    }
+                    if(serviceExist) throw new Error('Service already exist');
                     if (serviceCatId !== undefined){
-                        if(serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                            const servicesCat = await ServiceCat.findById(serviceCatId);
-                            if(!servicesCat){
-                                throw new Error('serviceCat not found');
-                            }
-                            const servicesByCat = await Service.find().where({
-                                serviceCat: serviceCatId
-                            });
-                            const newService = new Service({
-                                title,
-                                index: servicesByCat.length,
-                                serviceCat: serviceCatId,
-                                createdAt: new Date().toISOString(),
-                                createdBy: user._id
-                            });
-                            let service = await newService.save();
-                            servicesCat.services.push(service._id);
-                            await servicesCat.save();
-                            return transformService(service);
-                        } else throw new Error('Invalid serviceCat ObjectId');
+                        if(!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid serviceCat ObjectId');
+                        const servicesCat = await ServiceCat.findById(serviceCatId);
+                        if(!servicesCat) throw new Error('serviceCat not found');
+                        servicesCat.services.push(service._id);
+                        await servicesCat.save();
                     }
+                    const servicesByCat = await Service.find().where({
+                        serviceCat: serviceCatId
+                    });
+                    const newService = new Service({
+                        title,
+                        index: servicesByCat.length,
+                        serviceCat: serviceCatId === undefined ? null : serviceCatId,
+                        createdAt: new Date().toISOString(),
+                        createdBy: user._id
+                    });
+                    let service = await newService.save();
+                    return transformService(service);
                 } catch(err) {
                     throw new Error(err);
                 }
@@ -124,8 +113,7 @@ module.exports = {
             try{
                 if (!serviceId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid service ObjectId');
                 if (serviceCatId !== undefined){
-                    if(!serviceCatId.match(/^[0-9a-fA-F]{24}$/))
-                        throw new Error('Invalid serviceCat ObjectId')
+                    if(!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid serviceCat ObjectId')
                     const serviceCat = await ServiceCat.findById(serviceCatId);
                     if(!serviceCat) throw new Error('ServiceCat not found');
                 }
@@ -174,26 +162,24 @@ module.exports = {
         }, context){
             checkAuth(context);
             try{
-                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const service = await Service.findById(serviceId);
-                    if(service) {
-                        let serviceCatId = service.serviceCat;
-                        const index = service.index;
-                        await service.delete();
-                        await Service.updateMany({
-                            $and: [
-                                {serviceCat: serviceCatId},
-                                {index: {$gte: index}}
-                            ]
-                        }, {
-                            $inc: {index: -1}
-                        });
-                        await Service.findOneAndUpdate(serviceCatId, {
-                            $pull: {services: serviceId}
-                        });
-                        return 'Service deleted successfully';
-                    } else throw new Error('Service not found');
-                } else throw new Error('Invalid ObjectId');
+                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                const service = await Service.findById(serviceId);
+                if(service) throw new Error('Service not found');
+                let serviceCatId = service.serviceCat;
+                const index = service.index;
+                await service.delete();
+                await Service.updateMany({
+                    $and: [
+                        {serviceCat: serviceCatId},
+                        {index: {$gte: index}}
+                    ]
+                }, {
+                    $inc: {index: -1}
+                });
+                await Service.findOneAndUpdate(serviceCatId, {
+                    $pull: {services: serviceId}
+                });
+                return 'Service deleted successfully';
             } catch (err) {
                 throw new Error(err);
             }

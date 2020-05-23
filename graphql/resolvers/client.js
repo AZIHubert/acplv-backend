@@ -21,17 +21,15 @@ module.exports = {
             clientId
         }){
             try{
-                if(clientId.match(/^[0-9a-fA-F]{24}$/)) {
-                    let client = await Client.findById(clientId);
-                    if(client){
-                        client = {
-                            ...client._doc,
-                            _id: client._id,
-                            createdBy: userGetter(client.createdBy)
-                        };
-                        return client;
-                    } else throw new Error('Client not found');
-                } else throw new Error('Invalid ObjectId')
+                if(!clientId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                let client = await Client.findById(clientId);
+                if(!client) throw new Error('Client not found');
+                client = {
+                    ...client._doc,
+                    _id: client._id,
+                    createdBy: userGetter(client.createdBy)
+                };
+                return client;
             } catch(err) {
                 throw new Error(err);
             }
@@ -47,9 +45,7 @@ module.exports = {
                 const clientExist = await Client.findOne({
                     "title": {$regex: new RegExp(title, "i")}
                 });
-                if(clientExist){
-                    throw new Error('Client already exist');
-                }
+                if(clientExist) throw new Error('Client already exist');
                 const clients = await Client.find();
                 const newClient = new Client({
                     title,
@@ -74,32 +70,27 @@ module.exports = {
         }, context){
             checkAuth(context);
             try{
+                if(title.trim() === '') throw new Error('Can\'t be empty');
                 const client = await Client.findById(clientId);
-                if(!client){
-                    throw new Error('Client not found');
-                }
+                if(!client) throw new Error('Client not found');
                 const clientExist = await Client.findOne({
                     $and: [
                         {"title": {$regex: new RegExp(title, "i")}},
                         {"_id": {$ne: clientId}}
                     ]
                 });
-                if(clientExist){
-                    throw new Error('Client already exist');
+                if(clientExist) throw new Error('Client already exist');
+                if (clientId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                if(title !== client.title) throw new Error('Client has not changed');
+                let clientEdited = await Client.findByIdAndUpdate(clientId, {
+                    title
+                }, {new: true});
+                clientEdited = {
+                    ...clientEdited._doc,
+                    _id: clientEdited._id,
+                    createdBy: userGetter(clientEdited.createdBy)
                 }
-                if (clientId.match(/^[0-9a-fA-F]{24}$/)) {
-                    if(title !== client.title){
-                        let clientEdited = await Client.findByIdAndUpdate(clientId, {
-                            title
-                        }, {new: true});
-                        clientEdited = {
-                            ...clientEdited._doc,
-                            _id: clientEdited._id,
-                            createdBy: userGetter(clientEdited.createdBy)
-                        }
-                        return clientEdited;
-                    } else throw new Error('Client has not changed');
-                } else throw new Error('Invalid ObjectId');
+                return clientEdited;
             } catch (err) {
                 throw new Error(err);
             }
@@ -144,19 +135,17 @@ module.exports = {
         }, context){
             checkAuth(context);
             try {
-                if (clientId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const client = await Client.findById(clientId);
-                    if(client){
-                        const index = client.index;
-                        await client.delete();
-                        await Client.updateMany({
-                            index: {$gte: index}
-                        }, {
-                            $inc: {index: -1}
-                        });
-                    } else throw new Error('Client not found');
-                    return 'Client deleted successfully';
-                } else throw new Error('Invalid ObjectId');
+                if (!clientId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                const client = await Client.findById(clientId);
+                if(!client) throw new Error('Client not found');
+                const index = client.index;
+                await client.delete();
+                await Client.updateMany({
+                    index: {$gte: index}
+                }, {
+                    $inc: {index: -1}
+                });
+                return 'Client deleted successfully';
             } catch (err) {
                 throw new Error(err);
             }

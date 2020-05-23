@@ -73,6 +73,14 @@ module.exports = gql`
         confirmPassword: String!
         registerConfirmation: String!
     }
+    input EmailInput {
+        email: String!
+        firstName: String!
+        lastName: String!
+        company: String!
+        phone: String!
+        body: String!
+    }
     type Query {
         # getProjects: [Project]!
         # getProject(projectId: String!): Project!
@@ -114,6 +122,7 @@ module.exports = gql`
         # editUser(userInput: userInput): User!
         # logout(): String!
         # deleteAccount(): String!
+        # sendEmail(emailInput: EmailInput!): String!
     }
 `;
 

@@ -40,9 +40,7 @@ module.exports = {
                 confirmPassword,
                 registerConfirmation
             );
-            if(!valid){
-                throw new UserInputError('Errors', { errors });
-            }
+            if(!valid) throw new UserInputError('Errors', { errors });
             const userUsername = await User.findOne({
                 username
             });
@@ -87,9 +85,7 @@ module.exports = {
                 valid,
                 errors
             } = validateLoginInput(emailOrUsername, password);
-            if(!valid){
-                throw new UserInputError('Errors', { errors });
-            }
+            if(!valid) throw new UserInputError('Errors', { errors });
             const userUsername = await User.findOne({
                 username: emailOrUsername
             });

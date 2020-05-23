@@ -19,13 +19,10 @@ module.exports = {
             serviceCatId
         }){
             try{
-                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    let serviceCat = await ServiceCat.findById(serviceCatId);
-                    if(serviceCat) {
-                        return transformServiceCat(serviceCat);
-                    }
-                    else throw new Error('ServiceCat not found');
-                } else throw new Error('Invalid ObjectId');
+                if (!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                let serviceCat = await ServiceCat.findById(serviceCatId);
+                if(serviceCat) throw new Error('ServiceCat not found');
+                return transformServiceCat(serviceCat);
             } catch(err) {
                 throw new Error(err);
             }
@@ -37,12 +34,11 @@ module.exports = {
         }, context){
             const user = checkAuth(context);
             try{
+                if(title.trim() === "") throw new Error('Cant\'t be empty');
                 const serviceCatExist = await ServiceCat.findOne({
                     "title": {$regex: new RegExp(title, "i")}
                 });
-                if(serviceCatExist){
-                    throw new Error('ServiceCat already exist');
-                }
+                if(serviceCatExist) throw new Error('ServiceCat already exist');
                 const serviceCats = await ServiceCat.find();
                 const newServiceCat = new ServiceCat({
                     title,
@@ -63,27 +59,22 @@ module.exports = {
         }, context){
             checkAuth(context);
             try {
+                if(title.trim() === '') throw new Error('Can\'t be empty');
                 const serviceCat = await ServiceCat.findById(serviceCatId);
-                if(!serviceCat){
-                    throw new Error('ServiceCat not found');
-                }
+                if(!serviceCat) throw new Error('ServiceCat not found');
                 const serviceCatExist = await ServiceCat.findOne({
                     $and: [
                         {"title": {$regex: new RegExp(title, "i")}},
                         {"_id": {$ne: serviceCatId}}
                     ]
                 });
-                if(serviceCatExist){
-                    throw new Error('ServiceCat already exist');
-                }
-                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    if(title !== serviceCat.title){
-                        let serviceCatEdited = await ServiceCat.findByIdAndUpdate(serviceCatId, {
-                            title
-                        }, {new: true});
-                        return transformServiceCat(serviceCatEdited);
-                    } else throw new Error('ServiceCat has not changed');
-                } else throw new Error('Invalid ObjectId');
+                if(serviceCatExist) throw new Error('ServiceCat already exist');
+                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                if(title !== serviceCat.title) throw new Error('ServiceCat has not changed');
+                let serviceCatEdited = await ServiceCat.findByIdAndUpdate(serviceCatId, {
+                    title
+                }, {new: true});
+                return transformServiceCat(serviceCatEdited);
             } catch(err) {
                 throw new Error(err);
             }
@@ -129,24 +120,22 @@ module.exports = {
         }, context){
             checkAuth(context);
             try {
-                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) {
-                    const serviceCat = await ServiceCat.findById(serviceCatId);
-                    if(serviceCat){
-                        const index = serviceCat.index;
-                        await serviceCat.delete();
-                        await ServiceCat.updateMany({
-                            index: {$gte: index}
-                        }, {
-                            $inc: {index: -1}
-                        });
-                        await Service.updateMany({
-                            serviceCat: { $eq: serviceCatId }
-                        }, {
-                            $set: {serviceCat: null}
-                        });
-                    } else throw new Error('ServiceCat not found');
-                    return 'ServiceCat deleted successfully';
-                } else throw new Error('Invalid ObjectId');
+                if (serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                const serviceCat = await ServiceCat.findById(serviceCatId);
+                if(serviceCat) throw new Error('ServiceCat not found');
+                const index = serviceCat.index;
+                await serviceCat.delete();
+                await ServiceCat.updateMany({
+                    index: {$gte: index}
+                }, {
+                    $inc: {index: -1}
+                });
+                await Service.updateMany({
+                    serviceCat: { $eq: serviceCatId }
+                }, {
+                    $set: {serviceCat: null}
+                });
+                return 'ServiceCat deleted successfully';
             } catch (err) {
                 throw new Error(err);
             }
