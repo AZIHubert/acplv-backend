@@ -63,17 +63,19 @@ module.exports = {
                         servicesCat.services.push(service._id);
                         await servicesCat.save();
                     }
-                    const servicesByCat = await Service.find().where({
-                        serviceCat: serviceCatId
-                    });
                     const newService = new Service({
                         title,
-                        index: servicesByCat.length,
+                        index: 0,
                         serviceCat: serviceCatId === undefined ? null : serviceCatId,
                         createdAt: new Date().toISOString(),
                         createdBy: user._id
                     });
                     let service = await newService.save();
+                    await Service.updateMany({
+                        serviceCat: serviceCatId
+                    }, {
+                        $inc: {index: 1}
+                    });
                     return transformService(service);
                 } catch(err) {
                     throw new Error(err);

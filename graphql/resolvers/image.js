@@ -2,7 +2,7 @@ const Image = require('../../models/Image');
 const Project = require('../../models/Project');
 const checkAuth = require('../../util/checkAuth');
 const cloudinary = require('cloudinary').v2;
-const {userGetter} = require('../../util/merge');
+const {userGetter, transformImage} = require('../../util/merge');
 
 const {
     CLOUDINARY_CLOUD_NAME,
@@ -15,18 +15,14 @@ cloudinary.config({
     cloud_name: CLOUDINARY_CLOUD_NAME, 
     api_key: CLOUDINARY_API_KEY, 
     api_secret: CLOUDINARY_API_SECRET
-  });
+});
 
 module.exports = {
     Query: {
         async getImages(){
             try{
                 const images = await Image.find();
-                images = images.map(image => ({
-                    ...image._doc,
-                    _id: image._id,
-                    uploadBy: userGetter(image.uploadBy)
-                }));
+                images = images.map(image => transformImage(image));
                 return images;
             } catch(err) {
                 throw new Error(err);
@@ -39,12 +35,7 @@ module.exports = {
                 if (!imageId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
                 let image = await Image.findById(imageId);
                 if(imageId) throw new Error('Image not found');
-                image = {
-                    ...image._doc,
-                    _id: image._id,
-                    uploadBy: userGetter(image.uploadBy)
-                }
-                return image;
+                return transformImage(image);
             } catch(err) {
                 throw new Error(err);
             }
@@ -85,12 +76,7 @@ module.exports = {
                     uploadBy: user._id
                 });
                 let image = await newImage.save();
-                image = {
-                    ...image._doc,
-                    _id: image._id,
-                    createdBy: userGetter(image.createdBy)
-                };
-                return image;
+                return transformImage(image);
             } catch(err) {
                 throw new Error(err);
             }

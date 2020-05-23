@@ -46,12 +46,14 @@ module.exports = {
                     "title": {$regex: new RegExp(title, "i")}
                 });
                 if(clientExist) throw new Error('Client already exist');
-                const clients = await Client.find();
                 const newClient = new Client({
                     title,
-                    index: clients.length,
+                    index: 0,
                     createdAt: new Date().toISOString(),
                     createdBy: user._id
+                });
+                await Client.updateMany({
+                    $inc: {index: 1}
                 });
                 let client = await newClient.save();
                 client = {

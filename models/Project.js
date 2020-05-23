@@ -6,16 +6,19 @@ const {
 const projectSchema = new Schema({
     title: String,
     index: Number,
-    display: Number,
+    display: Boolean,
     type: {
         type: Schema.Types.ObjectId,
-        ref: 'types'
+        ref: 'Types'
     },
-    username: String,
     createdAt: String,
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
     thumbnailUrl: {
         type: Schema.Types.ObjectId,
-        ref: 'image'
+        ref: 'Image'
     }
 });
 

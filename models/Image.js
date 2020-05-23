@@ -12,7 +12,13 @@ const imageSchema = new Schema({
     uploadBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    project: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Project'
+    }],
+    isLogo: Boolean,
+    isFavicon: Boolean
 });
 
 module.exports = model('Image', imageSchema);

@@ -9,7 +9,7 @@ module.exports = gql`
         index: Int!
         display: Boolean!
         type: Type
-        username: ID
+        createdBy: User!
         createdAt: String!
         thumbnailUrl: Image
     }
@@ -51,6 +51,9 @@ module.exports = gql`
         url: String!
         uploadAt: String!
         uploadBy: User!
+        project: [Project]!
+        isFavicon: Boolean!
+        isLogo: Boolean!
     }
     type User {
         _id: ID!
@@ -65,6 +68,12 @@ module.exports = gql`
         username: String!
         isActive: Boolean!
         createdAt: String!
+    }
+    input ProjectInput {
+        title: String
+        display: Boolean!
+        typeId: ID
+        thumbnailId: ID
     }
     input RegisterInput {
         username: String!
@@ -82,8 +91,8 @@ module.exports = gql`
         body: String!
     }
     type Query {
-        # getProjects: [Project]!
-        # getProject(projectId: String!): Project!
+        getProjects: [Project]!
+        getProject(projectId: ID!): Project!
         getTypes: [Type]!
         getType(typeId: ID!): Type!
         getImages: [Image]!
@@ -97,9 +106,10 @@ module.exports = gql`
         getService(serviceId: ID!): Service!
     }
     type Mutation {
-        # createProject(projectInput: ProjectInput!): Project!
-        # editProject(projectId: ID!, projectInput: ProjectInput!): Project!
-        # deleteProject(projectId: Id!): String!
+        createProject(projectInput: ProjectInput!): Project!
+        editProject(projectId: ID!, projectInput: ProjectInput!): Project!
+        moveProject(projectId: ID!, index: String!): String!
+        deleteProject(projectId: ID!): String!
         createType(title: String!): Type!
         editType(typeId: ID!, title: String!): Type!
         deleteType(typeId: ID!): String!
@@ -125,5 +135,3 @@ module.exports = gql`
         # sendEmail(emailInput: EmailInput!): String!
     }
 `;
-
-// TODO: Change type Image by Thumbnail (to create specific route to upload image)

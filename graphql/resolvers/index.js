@@ -7,18 +7,18 @@ const userResolvers = require('./user');
 
 module.exports = {
     Query: {
+        ...projectResolvers.Query,
         ...typeResolvers.Query,
         ...client.Query,
         ...serviceResolvers.Query,
         ...serviceCatResolvers.Query
-        // ...projectResolvers.Query
     },
     Mutation: {
+        ...projectResolvers.Mutation,
         ...typeResolvers.Mutation,
         ...client.Mutation,
         ...userResolvers.Mutation,
         ...serviceResolvers.Mutation,
         ...serviceCatResolvers.Mutation
-        // ...projectResolvers.Mutation
     }
 }

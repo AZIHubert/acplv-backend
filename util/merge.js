@@ -5,6 +5,7 @@ const Service = require('../models/Service');
 const ServiceCat = require('../models/ServiceCat');
 const Project = require('../models/Project');
 const Type = require('../models/Type');
+const Image = require('../models/Image');
 
 // User //
 const userGetter = async function(userIds){
@@ -81,22 +82,22 @@ const services = async serviceIds => {
 };
 
 // Project //
-const projectsGetter = async function(projectsId){
-    if(!!projectsId.length)
-        return await projectLoader.loadMany(projectsId);
+const projectsGetter = async function(projectIds){
+    if(!!projectIds.length)
+        return await projectLoader.loadMany(projectIds);
     else return [];
 };
-const projectLoader = new DataLoader(projectsId => services(projectsId));
-const projects = async projectsId => {
+const projectLoader = new DataLoader(projectIds => projects(projectIds));
+const projects = async projectIds => {
     try {
-        projectsId = projectsId.map(projectId => Project.findById(projectId));
-        let projects = await Promise.all(projectsId);
+        projectIds = projectIds.map(projectId => Project.findById(projectId));
+        let projects = await Promise.all(projectIds);
         projects = projects.map(project => {
             return {
                 ...project._doc,
                 _id: project._id,
                 createdBy: () => userGetter(project.createdBy),
-                type: () => projectsGetter(project.type)
+                type: () => typeGetter(project.type)
             }
         }).sort((a, b) => a.index - b.index);
         return projects;
@@ -130,6 +131,30 @@ const type = async typeIds => {
     }
 };
 
+// Image //
+const imageGetter = async function(imageId){
+    if(imageId)
+        return await imageLoader.load(imageId);
+    else return null;
+};
+const imageLoader = new DataLoader(imageId => image(imageId));
+const image = async imageIds => {
+    try {
+        imageIds = imageIds.map(imageId => Image.findById(imageId));
+        let images = await Promise.all(imageIds);
+        images = images.map(image => {
+            return {
+                ...image._doc,
+                _id: image._id,
+                uploadBy: () => userGetter(image.createdBy)
+            }
+        });
+        return images;
+    } catch(err) {
+        throw new Error(err);
+    }
+};
+
 const transformService = service => ({
     ...service._doc,
     _id: service._id,
@@ -152,11 +177,20 @@ const transformType = type => ({
     ...type._doc,
     _id: type._id,
     createdBy: () => userGetter(type.createdBy),
-    projects: () => projectsGetter(type.projects)
+    projects: () => projectsGetter(type.projects),
+    thumbnails: () => imageGetter(type.thumbnails)
+});
+const transformImage = image => ({
+    ...image._doc,
+    _id: image._id,
+    uploadBy: () => userGetter(image.uploadBy),
+    projects: () => projectsGetter(image.projects)
 })
 
 module.exports.userGetter = userGetter;
+module.exports.imageGetter = imageGetter;
 module.exports.transformService = transformService;
 module.exports.transformServiceCat = transformServiceCat;
 module.exports.transformProject = transformProject;
 module.exports.transformType = transformType;
+module.exports.transformImage = transformImage;

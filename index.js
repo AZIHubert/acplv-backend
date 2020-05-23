@@ -26,3 +26,7 @@ mongoose.connect(MONGODB, {
 }).then(res => {
     console.log(`Server run on port ${res.url}`);
 });
+
+// TODO: test all routes
+// TODO: create emailSender
+// TODO: create general
