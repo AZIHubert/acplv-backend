@@ -98,7 +98,8 @@ module.exports = {
                 const serviceCats = await ServiceCat.find();
                 let serviceCat = await ServiceCat.findById(serviceCatId);
                 if(!serviceCat) throw new Error('ServiceCat not found');
-                if(index < 0 || index > serviceCats.length) throw new Error('Index out of range');
+                console.log(serviceCats.length);
+                if(index < 0 || index > serviceCats.length - 1) throw new Error('Index out of range');
                 let oldIndex = serviceCat.index;
                 serviceCat.index = index;
                 await ServiceCat.updateMany({
@@ -117,7 +118,7 @@ module.exports = {
                 }, {
                     $inc: {index: 1}
                 });
-                await service.save();
+                await serviceCat.save();
                 return 'ServiceCat successfully moved';
             } catch(err) {
                 throw new Error(err);

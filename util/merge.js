@@ -91,5 +91,6 @@ const transformServiceCat = serviceCat => ({
     services: () => servicesGetter(serviceCat.services)
 })
 
+module.exports.userGetter = userGetter;
 module.exports.transformService = transformService;
 module.exports.transformServiceCat = transformServiceCat;

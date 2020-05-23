@@ -133,7 +133,7 @@ module.exports = {
                 const serviceByCat = await Service.find({
                     serviceCat: {$eq: serviceCatId}
                 });
-                if(index < 0 || index > serviceByCat.length) throw new Error('Index out of range');
+                if(index < 0 || index > serviceByCat.length - 1) throw new Error('Index out of range');
                 if(!service) throw new Error('Service not found');
                 let oldIndex = service.index;
                 let oldServiceCatId = service.serviceCat;

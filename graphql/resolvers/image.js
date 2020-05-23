@@ -19,12 +19,36 @@ cloudinary.config({
 module.exports = {
     Query: {
         async getImages(){
-            // TODO: get all images (orderby date)
+            try{
+                const images = Image.fing();
+                images = images.map(image => ({
+                    ...image._doc,
+                    _id: image._id,
+                    uploadBy: userGetter(image.uploadBy)
+                }));
+                return images;
+            } catch(err) {
+                throw new Error(err);
+            }
         },
         async getImage(_, {
             imageId
         }){
-            // TODO: get singleimage
+            try{
+                if (imageId.match(/^[0-9a-fA-F]{24}$/)) {
+                    let image = await Image.findById(imageId);
+                    if(imageId) {
+                        image = {
+                            ...image._doc,
+                            _id: image._id,
+                            uploadBy: userGetter(image.uploadBy)
+                        }
+                        return image;
+                    } else throw new Error('Image not found');
+                } else throw new Error('Invalid ObjectId');
+            } catch(err) {
+                throw new Error(err);
+            }
         }
     },
     Mutation: {
