@@ -1,6 +1,5 @@
-const {
-    ApolloServer
-} = require('apollo-server');
+const express = require('express');
+const { ApolloServer  } = require('apollo-server-express');
 const mongoose = require('mongoose');
 
 const {
@@ -13,20 +12,22 @@ const resolvers = require('./graphql/resolvers')
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    playground: true,
     context: ({req}) => ({req})
 });
+const app = express();
+const port = process.env.port || 3000;
+
+server.applyMiddleware({ app });
+
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true
 }).then(() => {
     console.log('mongoDB connected...');
-    return server.listen({
-        port: 5000
-    });
+    return app.listen({ port });
 }).then(res => {
-    console.log(`Server run on port ${res.url}`);
+    console.log(`GraphQL available at http://localhost:${port}${server.graphqlPath}`)
 });
 
-// TODO: test all routes
 // TODO: create emailSender
-// TODO: create general
