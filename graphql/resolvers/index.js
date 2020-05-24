@@ -1,3 +1,4 @@
+const generalResolvers = require('./general');
 const typeResolvers = require('./type');
 const projectResolvers = require('./project');
 const client = require('./client');
@@ -7,6 +8,7 @@ const userResolvers = require('./user');
 
 module.exports = {
     Query: {
+        ...generalResolvers.Query,
         ...projectResolvers.Query,
         ...typeResolvers.Query,
         ...client.Query,
@@ -14,6 +16,7 @@ module.exports = {
         ...serviceCatResolvers.Query
     },
     Mutation: {
+        ...generalResolvers.Mutation,
         ...projectResolvers.Mutation,
         ...typeResolvers.Mutation,
         ...client.Mutation,

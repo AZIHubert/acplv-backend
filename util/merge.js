@@ -185,7 +185,13 @@ const transformImage = image => ({
     _id: image._id,
     uploadBy: () => userGetter(image.uploadBy),
     projects: () => projectsGetter(image.projects)
-})
+});
+const transformGeneral = general => ({
+    ...general._doc,
+    logo: () => imageGetter(general.logo),
+    favicon: () => imageGetter(general.favicon),
+    headerImage: () => imageGetter(general.headerImage)
+});
 
 module.exports.userGetter = userGetter;
 module.exports.imageGetter = imageGetter;
@@ -194,3 +200,4 @@ module.exports.transformServiceCat = transformServiceCat;
 module.exports.transformProject = transformProject;
 module.exports.transformType = transformType;
 module.exports.transformImage = transformImage;
+module.exports.transformGeneral = transformGeneral;

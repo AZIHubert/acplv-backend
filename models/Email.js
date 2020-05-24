@@ -8,9 +8,10 @@ const emailSchema = new Schema({
     firstName: String,
     lastName: String,
     company: String,
+    phone: String,
     subject: String,
     body: String,
-    createdAt: String
+    sendAt: String
 });
 
 module.exports = model('Email', emailSchema);

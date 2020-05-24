@@ -3,6 +3,25 @@ const {
 } = require('apollo-server');
 
 module.exports = gql`
+    type General {
+        logo: ID
+        favicon: ID
+        headerImage: ID
+        primaryColor: String!
+        secondaryColor: String!
+        tertiaryColor: String!
+        email: String
+        phone: String
+        about: String
+        whoAreWe: String
+        facebook: SocialNetwork
+        instagram: SocialNetwork
+        linkedin: SocialNetwork
+    }
+    type SocialNetwork {
+        isActive: Boolean!
+        link: String
+    }
     type Project {
         _id: ID!
         title: String!
@@ -69,6 +88,28 @@ module.exports = gql`
         isActive: Boolean!
         createdAt: String!
     }
+    input GeneralInput {
+        logoId: ID
+        faviconId: ID
+        headerImageId: ID
+        primaryColor: String,
+        secondaryColor: String,
+        tertiaryColor: String,
+        email: String,
+        phone: String,
+        about: String,
+        whoAreWe: String,
+        facebookIsActive: Boolean,
+        facebookLink: String,
+        instagramIsActive: Boolean,
+        instagramLink: String,
+        linkedinIsActive: Boolean,
+        linkedinLink: String
+    }
+    input SocialNetworkInput {
+        isActive: Boolean!,
+        link: String!
+    }
     input ProjectInput {
         title: String
         display: Boolean!
@@ -86,11 +127,14 @@ module.exports = gql`
         email: String!
         firstName: String!
         lastName: String!
-        company: String!
-        phone: String!
+        company: String
+        phone: String
+        subject: String!
         body: String!
+        sendAt: String!
     }
     type Query {
+        getGeneral: General!
         getProjects: [Project]!
         getProject(projectId: ID!): Project!
         getTypes: [Type]!
@@ -106,6 +150,7 @@ module.exports = gql`
         getService(serviceId: ID!): Service!
     }
     type Mutation {
+        editGeneral(generalInput: GeneralInput): General!
         createProject(projectInput: ProjectInput!): Project!
         editProject(projectId: ID!, projectInput: ProjectInput!): Project!
         moveProject(projectId: ID!, index: String!): String!

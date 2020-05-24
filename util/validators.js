@@ -8,6 +8,7 @@ const regExPasswordLength = /(?=.{8,})/;
 const regExPasswordLowerCase = /(?=.*[a-z])/;
 const regExPasswordUpperCase = /(?=.*[A-Z])/;
 const regExPasswordInt = /(?=.*[0-9])/;
+const regExBodyLength = /(?=.{5,})/;
 
 module.exports.validateRegisterInput = (
     username,
@@ -60,6 +61,39 @@ module.exports.validateLoginInput = (emailOrUsername, password) => {
     }
     if(password.trim() === ''){
         errors.password = 'Must not be empty';
+    }
+    return {
+        errors,
+        valid: !Object.keys(errors).length
+    }
+}
+
+module.exports.validateEmail = (
+    email,
+    firstName,
+    lastName,
+    subject,
+    body
+) => {
+    const errors = new Object();
+    if(email.trim() === ''){
+        errors.email = 'Must not be empty'
+    } else if(!email.match(regExValidEmail)){
+        errors.email = 'Must be a valid email adress';
+    }
+    if(firstName.trim() === ''){
+        errors.firstName = 'Must not be empty';
+    }
+    if(lastName.trim() === ''){
+        errors.lastName = 'Must not be empty';
+    }
+    if(subject.trim() === ''){
+        errors.subject = 'Must not be empty';
+    }
+    if(body.trim() === ''){
+        errors.body = 'Must not be empty';
+    } else if(!body.match(regExBodyLength)){
+        errors.body = 'Must have at least 5 characters';
     }
     return {
         errors,

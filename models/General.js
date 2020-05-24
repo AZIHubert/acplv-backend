@@ -3,23 +3,38 @@ const {
     Schema
 } = require('mongoose');
 
-const socialNetworkSchema = new Schema({
-    active: Boolean,
-    link: String
-});
-
 const generalSchema = new Schema({
-    favicon: String,
-    headerImage: String,
+    logo: {
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
+    },
+    favicon: {
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
+    },
+    headerImage: {
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
+    },
     primaryColor: String,
     secondaryColor: String,
     tertiaryColor: String,
     email: String,
     phone: String,
+    whoAreWe: String,
     about: String,
-    facebook: socialNetworkSchema,
-    instagram: socialNetworkSchema,
-    linkedin: socialNetworkSchema
+    facebook: {
+        isActive: Boolean,
+        link: String
+    },
+    instagram: {
+        isActive: Boolean,
+        link: String
+    },
+    linkedin: {
+        isActive: Boolean,
+        link: String
+    }
 });
 
 module.exports = model('General', generalSchema);
