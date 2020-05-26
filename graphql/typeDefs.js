@@ -13,7 +13,8 @@ module.exports = gql`
         email: String
         phone: String
         about: String
-        whoAreWe: String
+        whoAreWeFirst: String
+        whoAreWeSecond: String
         facebook: SocialNetwork
         instagram: SocialNetwork
         linkedin: SocialNetwork
@@ -92,18 +93,19 @@ module.exports = gql`
         logoId: ID
         faviconId: ID
         headerImageId: ID
-        primaryColor: String,
-        secondaryColor: String,
-        tertiaryColor: String,
-        email: String,
-        phone: String,
-        about: String,
-        whoAreWe: String,
-        facebookIsActive: Boolean,
-        facebookLink: String,
-        instagramIsActive: Boolean,
-        instagramLink: String,
-        linkedinIsActive: Boolean,
+        primaryColor: String
+        secondaryColor: String
+        tertiaryColor: String
+        email: String
+        phone: String
+        about: String
+        whoAreWeFirst: String
+        whoAreWeSecond: String
+        facebookIsActive: Boolean
+        facebookLink: String
+        instagramIsActive: Boolean
+        instagramLink: String
+        linkedinIsActive: Boolean
         linkedinLink: String
     }
     input SocialNetworkInput {
@@ -131,7 +133,6 @@ module.exports = gql`
         phone: String
         subject: String!
         body: String!
-        sendAt: String!
     }
     type Query {
         getGeneral: General!
@@ -177,6 +178,6 @@ module.exports = gql`
         # editUser(userInput: userInput): User!
         # logout(): String!
         # deleteAccount(): String!
-        # sendEmail(emailInput: EmailInput!): String!
+        sendEmail(emailInput: EmailInput!): String!
     }
 `;

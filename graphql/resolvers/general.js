@@ -19,7 +19,8 @@ module.exports = {
                         email: null,
                         phone: null,
                         about: null,
-                        whoAreWe: null,
+                        whoAreWeFirst: null,
+                        whoAreWeSecond: null,
                         facebook: {
                             isActive: false,
                             link: null
@@ -46,7 +47,7 @@ module.exports = {
             generalInput: {
                 logoId, faviconId, headerImageId,
                 primaryColor, secondaryColor, tertiaryColor,
-                email, phone, about, whoAreWe,
+                email, phone, about, whoAreWeFirst, whoAreWeSecond,
                 facebookIsActive, facebookLink,
                 instagramIsActive, instagramLink,
                 linkedinIsActive, linkedinLink
@@ -69,7 +70,7 @@ module.exports = {
                     const headerImage = await Image.findById(headerImage);
                     if(!headerImage) throw new Error('headerImage not found');
                 }
-                if(email !== undefined){
+                if(email !== undefined && email.trim() !== ''){
                     if(!email.match(/^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/))
                     throw new Error('Must be a valid email adress');
                 }
@@ -85,7 +86,8 @@ module.exports = {
                     editedGeneral.email = email !== undefined ? email : editedGeneral.email;
                     editedGeneral.phone = phone !== undefined ? phone : editedGeneral.phone;
                     editedGeneral.about = about !== undefined ? about : editedGeneral.about;
-                    editedGeneral.whoAreWe = whoAreWe !== undefined ? whoAreWe : editedGeneral.whoAreWe;
+                    editedGeneral.whoAreWeFirst = whoAreWeFirst !== undefined ? whoAreWeFirst : editedGeneral.whoAreWeFirst;
+                    editedGeneral.whoAreWeSecond = whoAreWeSecond !== undefined ? whoAreWeSecond : editedGeneral.whoAreWeSecond;
                     editedGeneral.facebook.isActive = facebookIsActive !== undefined ? facebookIsActive : editedGeneral.facebook.isActive;
                     editedGeneral.facebook.link = facebookLink !== undefined ? facebookLink : editedGeneral.facebook.link;
                     editedGeneral.linkedin.isActive = linkedinIsActive !== undefined ? linkedinIsActive : editedGeneral.linkedin.isActive;
@@ -104,7 +106,8 @@ module.exports = {
                         email: null,
                         phone: null,
                         about: null,
-                        whoAreWe: null,
+                        whoAreWeFirst: null,
+                        whoAreWeSecond: null,
                         facebook: {
                             isActive: facebookIsActive !== undefined ? facebookIsActive : false,
                             link: null

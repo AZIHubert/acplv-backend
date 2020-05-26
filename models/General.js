@@ -21,7 +21,8 @@ const generalSchema = new Schema({
     tertiaryColor: String,
     email: String,
     phone: String,
-    whoAreWe: String,
+    whoAreWeFirst: String,
+    whoAreWeSecond: String,
     about: String,
     facebook: {
         isActive: Boolean,

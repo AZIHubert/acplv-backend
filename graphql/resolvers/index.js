@@ -5,6 +5,7 @@ const client = require('./client');
 const serviceCatResolvers = require('./serviceCat');
 const serviceResolvers = require('./service');
 const userResolvers = require('./user');
+const emailResolvers = require('./email');
 
 module.exports = {
     Query: {
@@ -22,6 +23,7 @@ module.exports = {
         ...client.Mutation,
         ...userResolvers.Mutation,
         ...serviceResolvers.Mutation,
-        ...serviceCatResolvers.Mutation
+        ...serviceCatResolvers.Mutation,
+        ...emailResolvers.Mutation
     }
 }

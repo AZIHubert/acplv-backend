@@ -16,18 +16,19 @@ const server = new ApolloServer({
     context: ({req}) => ({req})
 });
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.port || 5000;
 
 server.applyMiddleware({ app });
 
-
 mongoose.connect(MONGODB, {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 }).then(() => {
     console.log('mongoDB connected...');
     return app.listen({ port });
-}).then(res => {
-    console.log(`GraphQL available at http://localhost:${port}${server.graphqlPath}`)
+}).then(() => {
+    console.log(`GraphQL available at http://localhost:${port}${server.graphqlPath}`);
+    console.log('To quit, type CRTL+c');
 });
 
-// TODO: create emailSender
+// TODO: Change errors by apollo errors
