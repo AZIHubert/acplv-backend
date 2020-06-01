@@ -4,9 +4,6 @@ const {
 
 module.exports = gql`
     type General {
-        logo: ID
-        favicon: ID
-        headerImage: ID
         primaryColor: String!
         secondaryColor: String!
         tertiaryColor: String!
@@ -18,6 +15,8 @@ module.exports = gql`
         facebook: SocialNetwork
         instagram: SocialNetwork
         linkedin: SocialNetwork
+        adressStreet: String
+        adressCity: String
     }
     type SocialNetwork {
         isActive: Boolean!
@@ -90,9 +89,6 @@ module.exports = gql`
         createdAt: String!
     }
     input GeneralInput {
-        logoId: ID
-        faviconId: ID
-        headerImageId: ID
         primaryColor: String
         secondaryColor: String
         tertiaryColor: String
@@ -107,6 +103,8 @@ module.exports = gql`
         instagramLink: String
         linkedinIsActive: Boolean
         linkedinLink: String
+        adressStreet: String
+        adressCity: String
     }
     input SocialNetworkInput {
         isActive: Boolean!,
@@ -139,12 +137,14 @@ module.exports = gql`
         getProjects: [Project]!
         getProject(projectId: ID!): Project!
         getTypes: [Type]!
+        getUsedTypes: [Type]!
         getType(typeId: ID!): Type!
         getImages: [Image]!
         getImage(imageId: ID!): Image!
         getClients: [Client]!
         getClient(clientId: ID!): Client!
         getServiceCats: [ServiceCat]!
+        getServiceCatsWithServices: [ServiceCat]!
         getServiceCat(serviceCatId: ID!): ServiceCat!
         getServices: [Service]!
         getServicesByCat(serviceCatId: ID!): [Service]!

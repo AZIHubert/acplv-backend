@@ -45,12 +45,12 @@ module.exports = {
                 const emailToSend = await newEmail.save();
                 const general = await General.findOne();
                 const emailGeneral = general.email;
-                if(emailGeneral === null || !emailGeneral.match(regExValidEmail)) throw new Error('Sorry, you can\'t contact use for now');
-                // TODO: send email to emailGeneral with nodemailer
+                if(emailGeneral === null || !emailGeneral.match(regExValidEmail))
+                    throw new Error('Sorry, you can\'t contact use for now');
                 var transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
                     port: 465,
-                    secure: true, // use SSL
+                    secure: true,
                     auth: {
                         user: OUTLOOK_EMAIL,
                         pass: OUTLOOK_PASSWORD

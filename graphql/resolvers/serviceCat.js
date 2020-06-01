@@ -15,6 +15,17 @@ module.exports = {
                 throw new Error(err);
             }
         },
+        async getServiceCatsWithServices(){
+            try{
+                let serviceCats = await ServiceCat.find({
+                    services: {$gt: []}
+                }).sort({index: 1});
+                serviceCats = serviceCats.map(serviceCat => transformServiceCat(serviceCat));
+                return serviceCats;
+            } catch(err) {
+                throw new Error(err);
+            }
+        },
         async getServiceCat(_, {
             serviceCatId
         }){

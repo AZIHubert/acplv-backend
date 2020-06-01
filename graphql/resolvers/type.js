@@ -14,6 +14,17 @@ module.exports = {
                 throw new Error(err);
             }
         },
+        async getUsedTypes(){
+            try{
+                let types = await Type.find({
+                    projects: {$gt: []}
+                });
+                types = types.map(type => transformType(type));
+                return types;
+            } catch(err) {
+                throw new Error(err);
+            }
+        },
         async getType(_, {
             typeId
         }){

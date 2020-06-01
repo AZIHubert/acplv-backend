@@ -4,18 +4,6 @@ const {
 } = require('mongoose');
 
 const generalSchema = new Schema({
-    logo: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    },
-    favicon: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    },
-    headerImage: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    },
     primaryColor: String,
     secondaryColor: String,
     tertiaryColor: String,
@@ -24,6 +12,8 @@ const generalSchema = new Schema({
     whoAreWeFirst: String,
     whoAreWeSecond: String,
     about: String,
+    adressStreet: String,
+    adressCity: String,
     facebook: {
         isActive: Boolean,
         link: String

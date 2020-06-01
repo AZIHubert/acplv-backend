@@ -29,6 +29,8 @@ mongoose.connect(MONGODB, {
 }).then(() => {
     console.log(`GraphQL available at http://localhost:${port}${server.graphqlPath}`);
     console.log('To quit, type CRTL+c');
+}).catch(err => {
+    console.log(err);
 });
 
 // TODO: Change errors by apollo errors

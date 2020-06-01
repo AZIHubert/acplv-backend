@@ -1,6 +1,5 @@
 const General = require('../../models/General');
 const Image = require('../../models/Image');
-const {transformGeneral} = require('../../util/merge');
 const checkAuth = require('../../util/checkAuth');
 
 module.exports = {
@@ -10,9 +9,6 @@ module.exports = {
                 let general = await General.findOne();
                 if(!general) {
                     const newGeneral = new General({
-                        logo: null,
-                        favicon: null,
-                        headerImage: null,
                         primaryColor: '#000',
                         secondaryColor: '#fff',
                         tertiaryColor: '#e4ac49',
@@ -32,11 +28,13 @@ module.exports = {
                         linkedin: {
                             isActive: false,
                             link: null
-                        }
+                        },
+                        adressStreet: null,
+                        adressCity: null
                     });
                     general = await newGeneral.save();
                 }
-                return transformGeneral(general)
+                return general
             } catch(err) {
                 throw new Error(err);
             }
@@ -45,31 +43,16 @@ module.exports = {
     Mutation: {
         async editGeneral(_, {
             generalInput: {
-                logoId, faviconId, headerImageId,
                 primaryColor, secondaryColor, tertiaryColor,
                 email, phone, about, whoAreWeFirst, whoAreWeSecond,
                 facebookIsActive, facebookLink,
                 instagramIsActive, instagramLink,
-                linkedinIsActive, linkedinLink
+                linkedinIsActive, linkedinLink,
+                adressStreet, adressCity
             }
         }, context){
             checkAuth(context);
             try {
-                if (logoId !== undefined){
-                    if(!logoId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid logo ObjectId');
-                    const logo = await Image.findById(logoId);
-                    if(!logo) throw new Error('Logo not found');
-                }
-                if(faviconId !== undefined){
-                    if(!faviconId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid favicon ObjectId');
-                    const favicon = await Image.findById(faviconId);
-                    if(!favicon) throw new Error('Favicon not found');
-                }
-                if(headerImageId !== undefined) {
-                    if(!headerImageId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid headerImage ObjectId');
-                    const headerImage = await Image.findById(headerImage);
-                    if(!headerImage) throw new Error('headerImage not found');
-                }
                 if(email !== undefined && email.trim() !== ''){
                     if(!email.match(/^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/))
                     throw new Error('Must be a valid email adress');
@@ -77,9 +60,6 @@ module.exports = {
                 const editedGeneral = await General.findOne();
                 let general;
                 if(!!editedGeneral){
-                    editedGeneral.logo = logoId !== undefined ? logoId : editedGeneral.logoId;
-                    editedGeneral.favicon = faviconId !== undefined  ? faviconId : editedGeneral.faviconId;
-                    editedGeneral.headerImage = headerImageId !== undefined ? headerImageId : editedGeneral.headerImageId;
                     editedGeneral.primaryColor = primaryColor !== undefined ? primaryColor : editedGeneral.primaryColor;
                     editedGeneral.secondaryColor = secondaryColor !== undefined ? secondaryColor : editedGeneral.secondaryColor;
                     editedGeneral.tertiaryColor = tertiaryColor !== undefined ? tertiaryColor : editedGeneral.tertiaryColor;
@@ -94,12 +74,11 @@ module.exports = {
                     editedGeneral.linkedin.link = linkedinLink !== undefined ? linkedinLink : editedGeneral.linkedin.link;
                     editedGeneral.instagram.isActive = instagramIsActive !== undefined ? instagramIsActive : editedGeneral.instagram.isActive;
                     editedGeneral.instagram.link = instagramLink !== undefined ? instagramLink : editedGeneral.instagram.link;
+                    editedGeneral.adressCity = adressCity !== undefined ? adressCity : editedGeneral.adressCity;
+                    editedGeneral.adressStreet = adressStreet !== undefined ? adressStreet : editedGeneral.adressStreet;
                     general = await editedGeneral.save();
                 } else {
                     const newGeneral = new General({
-                        logo: null,
-                        favicon: null,
-                        headerImage: null,
                         primaryColor: primaryColor !== undefined ? primaryColor : '#000',
                         secondaryColor: secondaryColor !== undefined ? secondaryColor : '#fff',
                         tertiaryColor: tertiaryColor !== undefined ? tertiaryColor : '#e4ac49',
@@ -119,11 +98,13 @@ module.exports = {
                         linkedin: {
                             isActive: linkedinIsActive != undefined ? linkedinIsActive : false,
                             link: null
-                        }
+                        },
+                        adressCity: null,
+                        adressStreet: null
                     });
                     general = await newGeneral.save();
                 }
-                return transformGeneral(general)
+                return general;
             } catch(err) {
                 throw new Error(err);
             }
