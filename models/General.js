@@ -14,18 +14,9 @@ const generalSchema = new Schema({
     about: String,
     adressStreet: String,
     adressCity: String,
-    facebook: {
-        isActive: Boolean,
-        link: String
-    },
-    instagram: {
-        isActive: Boolean,
-        link: String
-    },
-    linkedin: {
-        isActive: Boolean,
-        link: String
-    }
+    facebookLink: String,
+    instagramLink: String,
+    linkedinLink:  String
 });
 
 module.exports = model('General', generalSchema);

@@ -57,7 +57,7 @@ module.exports = {
             if(userEmail) {
                 throw new UserInputError('Email is taken', {
                     errors: {
-                        username: 'This email is already taken'
+                        email: 'This email is already taken'
                     }
                 });
             }

@@ -18,19 +18,18 @@ module.exports = {
                 body
             }
         }){
+            const {
+                valid,
+                errors
+            } = validateEmail(
+                email,
+                firstName,
+                lastName,
+                subject,
+                body
+            );
+            if(!valid) throw new UserInputError('Errors', { errors });
             try{
-                console.log('test')
-                const {
-                    valid,
-                    errors
-                } = validateEmail(
-                    email,
-                    firstName,
-                    lastName,
-                    subject,
-                    body
-                );
-                if(!valid) throw new UserInputError('Errors', { errors });
                 const regExValidEmail = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
                 const newEmail = new Email({
                     email,
@@ -56,7 +55,7 @@ module.exports = {
                         pass: OUTLOOK_PASSWORD
                     }
                 });
-                console.log(emailToSend.subject, emailToSend.email)
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 var mailOptions = {
                     from: `"NEW EMAIL from ACPLV" <${OUTLOOK_EMAIL}>`,
                     to: emailGeneral,
@@ -64,13 +63,13 @@ module.exports = {
                     text: body,
                     html: `
                     <h1>
-                        ${emailToSend.firstName} ${emailToSend.lastName} ${emailToSend.company ? "(" : ""} ${emailToSend.company ? emailToSend.comany : ""} ${emailToSend.company ? ")" : ""} send you a message
+                        ${emailToSend.firstName} ${emailToSend.lastName} ${emailToSend.company ? "(" : ""} ${emailToSend.company ? emailToSend.comany : ""} ${emailToSend.company ? ")" : ""} vous a envoyé un message
                     </h1>
                     <h2>
-                        at ${new Date(emailToSend.sendAt).getFullYear()}
+                        le ${new Date(emailToSend.sendAt).toLocaleDateString('fr-FR', options)} a ${new Date(emailToSend.sendAt).getHours()} heure ${new Date(emailToSend.sendAt).getMinutes()}
                     </h2>
                     <br/>
-                    <h3>email: ${emailToSend.email ? emailToSend.email : ''}</h3>
+                    <h3>email: <a href="mailto:${emailToSend.email ? emailToSend.email : ''}">${emailToSend.email ? emailToSend.email : ''}</a></h3>
                     <h3>${emailToSend.phone ? 'phone:' : ''} ${emailToSend.phone ? emailToSend.phone : ''}</h3>
                     <br />
                     <p>${emailToSend.body}</p>

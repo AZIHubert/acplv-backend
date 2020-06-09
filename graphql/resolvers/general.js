@@ -17,18 +17,9 @@ module.exports = {
                         about: null,
                         whoAreWeFirst: null,
                         whoAreWeSecond: null,
-                        facebook: {
-                            isActive: false,
-                            link: null
-                        },
-                        instagram: {
-                            isActive: false,
-                            link: null
-                        },
-                        linkedin: {
-                            isActive: false,
-                            link: null
-                        },
+                        facebookLink: null,
+                        instagramLink: null,
+                        linkedinLink: null,
                         adressStreet: null,
                         adressCity: null
                     });
@@ -45,9 +36,7 @@ module.exports = {
             generalInput: {
                 primaryColor, secondaryColor, tertiaryColor,
                 email, phone, about, whoAreWeFirst, whoAreWeSecond,
-                facebookIsActive, facebookLink,
-                instagramIsActive, instagramLink,
-                linkedinIsActive, linkedinLink,
+                facebookLink, instagramLink, linkedinLink,
                 adressStreet, adressCity
             }
         }, context){
@@ -68,12 +57,9 @@ module.exports = {
                     editedGeneral.about = about !== undefined ? about : editedGeneral.about;
                     editedGeneral.whoAreWeFirst = whoAreWeFirst !== undefined ? whoAreWeFirst : editedGeneral.whoAreWeFirst;
                     editedGeneral.whoAreWeSecond = whoAreWeSecond !== undefined ? whoAreWeSecond : editedGeneral.whoAreWeSecond;
-                    editedGeneral.facebook.isActive = facebookIsActive !== undefined ? facebookIsActive : editedGeneral.facebook.isActive;
-                    editedGeneral.facebook.link = facebookLink !== undefined ? facebookLink : editedGeneral.facebook.link;
-                    editedGeneral.linkedin.isActive = linkedinIsActive !== undefined ? linkedinIsActive : editedGeneral.linkedin.isActive;
-                    editedGeneral.linkedin.link = linkedinLink !== undefined ? linkedinLink : editedGeneral.linkedin.link;
-                    editedGeneral.instagram.isActive = instagramIsActive !== undefined ? instagramIsActive : editedGeneral.instagram.isActive;
-                    editedGeneral.instagram.link = instagramLink !== undefined ? instagramLink : editedGeneral.instagram.link;
+                    editedGeneral.facebookLink = facebookLink !== undefined ? facebookLink : editedGeneral.facebookLink;
+                    editedGeneral.linkedinLink = linkedinLink !== undefined ? linkedinLink : editedGeneral.linkedinLink;
+                    editedGeneral.instagramLink = instagramLink !== undefined ? instagramLink : editedGeneral.instagramLink;
                     editedGeneral.adressCity = adressCity !== undefined ? adressCity : editedGeneral.adressCity;
                     editedGeneral.adressStreet = adressStreet !== undefined ? adressStreet : editedGeneral.adressStreet;
                     general = await editedGeneral.save();
@@ -87,18 +73,9 @@ module.exports = {
                         about: null,
                         whoAreWeFirst: null,
                         whoAreWeSecond: null,
-                        facebook: {
-                            isActive: facebookIsActive !== undefined ? facebookIsActive : false,
-                            link: null
-                        },
-                        instagram: {
-                            isActive: instagramIsActive !== undefined ? instagramIsActive : false,
-                            link: null
-                        },
-                        linkedin: {
-                            isActive: linkedinIsActive != undefined ? linkedinIsActive : false,
-                            link: null
-                        },
+                        facebookLink: null,
+                        instagramLink: null,
+                        linkedinLink: null,
                         adressCity: null,
                         adressStreet: null
                     });

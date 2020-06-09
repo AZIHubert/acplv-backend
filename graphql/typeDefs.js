@@ -12,15 +12,11 @@ module.exports = gql`
         about: String
         whoAreWeFirst: String
         whoAreWeSecond: String
-        facebook: SocialNetwork
-        instagram: SocialNetwork
-        linkedin: SocialNetwork
+        facebookLink: String
+        instagramLink: String
+        linkedinLink: String
         adressStreet: String
         adressCity: String
-    }
-    type SocialNetwork {
-        isActive: Boolean!
-        link: String
     }
     type Project {
         _id: ID!
@@ -97,11 +93,8 @@ module.exports = gql`
         about: String
         whoAreWeFirst: String
         whoAreWeSecond: String
-        facebookIsActive: Boolean
         facebookLink: String
-        instagramIsActive: Boolean
         instagramLink: String
-        linkedinIsActive: Boolean
         linkedinLink: String
         adressStreet: String
         adressCity: String
