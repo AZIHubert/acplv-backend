@@ -67,8 +67,6 @@ module.exports = gql`
         uploadAt: String!
         uploadBy: User!
         project: [Project]!
-        isFavicon: Boolean!
-        isLogo: Boolean!
     }
     type User {
         _id: ID!

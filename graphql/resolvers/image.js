@@ -105,15 +105,6 @@ module.exports = {
                         thumbnail: null
                     });
                 }
-                if(imageType === "logo"){
-
-                }
-                if(imageType === "favicon"){
-
-                }
-                if(imageType === "headerImage"){
-
-                }
                 return 'Image deleted successfully';
             } catch(err) {
                 throw new Error(err);

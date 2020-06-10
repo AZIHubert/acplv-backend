@@ -16,9 +16,7 @@ const imageSchema = new Schema({
     project: [{
         type: Schema.Types.ObjectId,
         ref: 'Project'
-    }],
-    isLogo: Boolean,
-    isFavicon: Boolean
+    }]
 });
 
 module.exports = model('Image', imageSchema);
