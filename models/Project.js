@@ -16,7 +16,7 @@ const projectSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     },
-    thumbnailUrl: {
+    thumbnail: {
         type: Schema.Types.ObjectId,
         ref: 'Image'
     }

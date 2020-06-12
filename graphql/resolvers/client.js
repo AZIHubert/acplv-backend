@@ -1,6 +1,7 @@
 const Client = require('../../models/Client');
 const checkAuth = require('../../util/checkAuth');
 const {userGetter} = require('../../util/merge');
+const { UserInputError } = require('apollo-server-express');
 
 module.exports = {
     Query: {
@@ -40,12 +41,21 @@ module.exports = {
             title
         }, context){
             const user = checkAuth(context);
+            if(title.trim() === '') throw new UserInputError('Errors', {
+                errors: { title: 'Cant\'t be empty' }
+            });
+            let clientExist;
             try {
-                if(title.trim() === '') throw new Error('Can\'t be empty');
-                const clientExist = await Client.findOne({
+                clientExist = await Client.findOne({
                     "title": {$regex: new RegExp(title, "i")}
                 });
-                if(clientExist) throw new Error('Client already exist');
+            } catch(err) {
+                throw new Error(err)
+            }
+            if(clientExist) throw new UserInputError('Errors', {
+                errors: { title: 'Client already exist' }
+            });
+            try{
                 const newClient = new Client({
                     title,
                     index: 0,
@@ -71,19 +81,35 @@ module.exports = {
             title
         }, context){
             checkAuth(context);
+            if(title.trim() === '') throw new UserInputError('Errors', {
+                errors: { title: 'Cant\'t be empty' }
+            });
+            let client;
             try{
-                if(title.trim() === '') throw new Error('Can\'t be empty');
-                const client = await Client.findById(clientId);
-                if(!client) throw new Error('Client not found');
-                const clientExist = await Client.findOne({
+                client = await Client.findById(clientId);
+            } catch(err) {
+                throw new Error(err);
+            }
+            if(!client) throw new Error('Client not found');
+            let clientExist;
+            try{
+                clientExist = await Client.findOne({
                     $and: [
                         {"title": {$regex: new RegExp(title, "i")}},
                         {"_id": {$ne: clientId}}
                     ]
                 });
-                if(clientExist) throw new Error('Client already exist');
-                if (clientId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
-                if(title !== client.title) throw new Error('Client has not changed');
+            } catch(err) {
+                throw new Error(err)
+            }
+            if(clientExist) throw new UserInputError('Errors', {
+                errors: { title: 'Client already exist' }
+            });
+            if(title === client.title) throw new UserInputError('Errors', {
+                errors: { title: 'Client has not changed' }
+            });
+            if (!clientId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+            try{
                 let clientEdited = await Client.findByIdAndUpdate(clientId, {
                     title
                 }, {new: true});

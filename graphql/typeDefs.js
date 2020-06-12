@@ -150,7 +150,7 @@ module.exports = gql`
         createType(title: String!): Type!
         editType(typeId: ID!, title: String!): Type!
         deleteType(typeId: ID!): String!
-        uploadImage(imageFile: Upload!, type: String): Image!
+        uploadImage(imageFile: Upload!): String!
         deleteImage(imageId: ID): String!
         createClient(title: String): Client!
         editClient(clientId: ID!, title: String): Client!

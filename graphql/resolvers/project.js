@@ -36,7 +36,7 @@ module.exports = {
                 title,
                 display,
                 typeId,
-                thumbnailId
+                thumbnail: thumbnailId
             }
         }, context){
             const user = checkAuth(context)
@@ -90,10 +90,12 @@ module.exports = {
                 title,
                 display,
                 typeId,
-                thumbnailId
+                thumbnail: thumbnailId
             }
         }, context){
             checkAuth(context);
+            console.log('test')
+            console.log(display)
             try{
                 if (!projectId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid service ObjectId');
                 let project = await Project.findById(projectId);

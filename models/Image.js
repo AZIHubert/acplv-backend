@@ -8,7 +8,6 @@ const imageSchema = new Schema({
     format: String,
     url: String,
     uploadAt: String,
-    type: String,
     uploadBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'

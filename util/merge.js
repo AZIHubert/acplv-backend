@@ -171,14 +171,14 @@ const transformProject = project => ({
     ...project._doc,
     _id: project._id,
     createdBy: () => userGetter(project.createdBy),
-    type: () => typeGetter(project.type)
+    type: () => typeGetter(project.type),
+    thumbnail: () => imageGetter(project.thumbnails)
 });
 const transformType = type => ({
     ...type._doc,
     _id: type._id,
     createdBy: () => userGetter(type.createdBy),
-    projects: () => projectsGetter(type.projects),
-    thumbnails: () => imageGetter(type.thumbnails)
+    projects: () => projectsGetter(type.projects)
 });
 const transformImage = image => ({
     ...image._doc,

@@ -6,6 +6,7 @@ const serviceCatResolvers = require('./serviceCat');
 const serviceResolvers = require('./service');
 const userResolvers = require('./user');
 const emailResolvers = require('./email');
+const imageResolvers = require('./image');
 
 module.exports = {
     Query: {
@@ -14,7 +15,8 @@ module.exports = {
         ...typeResolvers.Query,
         ...client.Query,
         ...serviceResolvers.Query,
-        ...serviceCatResolvers.Query
+        ...serviceCatResolvers.Query,
+        ...imageResolvers.Query
     },
     Mutation: {
         ...generalResolvers.Mutation,
@@ -24,6 +26,7 @@ module.exports = {
         ...userResolvers.Mutation,
         ...serviceResolvers.Mutation,
         ...serviceCatResolvers.Mutation,
-        ...emailResolvers.Mutation
+        ...emailResolvers.Mutation,
+        ...imageResolvers.Mutation
     }
 }
