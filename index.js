@@ -17,10 +17,17 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     playground: false,
-    cors: true,
     context: ({req}) => ({req})
 });
 const app = express();
+
+const corsOptions = {
+    origin: true,
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+
 const port = process.env.PORT || 5000;
 
 server.applyMiddleware({ app, cors: false });
