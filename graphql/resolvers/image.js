@@ -91,7 +91,7 @@ module.exports = {
                 const image = await Image.findById(imageId);
                 if(!image) throw new Error('Image not found');
                 const oldImageId = image._id;
-                await cloudinary.uploader.destroy(image.public_id,  {
+                await cloudinary.uploader.destroy(image.filename,  {
                     type: "authenticated"
                 },(err, res) => {
                     if(err){
