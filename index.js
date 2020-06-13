@@ -18,13 +18,14 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     playground: false,
+    cors: false,
     context: ({req}) => ({req})
 });
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
-app.use(cors())
+// app.use(cors())
 
 server.applyMiddleware({ app });
 
