@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 });
 app.use(graphqlEndpoint, bodyParser.json());
 
-server.applyMiddleware({ app, cors: { origin: 'http://acplv.com', credentials: true } });
+server.applyMiddleware({ app, cors: { origin: '*', credentials: true } });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
