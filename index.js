@@ -18,7 +18,20 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     playground: false,
-    cors: false,
+    cors: {
+        credentials: true,
+        origin: (origin, callback) => {
+            const whitelist = [
+                "http://www.acplv.com/"
+            ];
+
+            if (whitelist.indexOf(origin) !== -1) {
+                callback(null, true)
+            } else {
+                callback(new Error("Not allowed by CORS"))
+            }
+        }
+    }
     context: ({req}) => ({req})
 });
 const app = express();
