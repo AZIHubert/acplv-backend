@@ -26,7 +26,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(graphqlEndpoint, bodyParser.json());
 
-server.applyMiddleware({ app, cors: { origin: 'http://acplv.com', credentials: true } });
+server.applyMiddleware({ app, cors: false });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
