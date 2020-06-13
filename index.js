@@ -4,6 +4,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
+const corsOptions = {
+    origin: 'http://acplv.com',
+    credentials: true
+  }
+  
 
 const {
 	MONGODB
@@ -26,7 +31,7 @@ const port = process.env.PORT || 5000;
 app.use(cors())
 app.use(graphqlEndpoint, bodyParser.json());
 
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, cors: corsOptions });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
