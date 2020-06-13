@@ -53,16 +53,10 @@ module.exports = {
                 try {
                     if(title.trim() === '') throw new Error('Can\'t have an empty title');
                     const serviceExist = await Service.findOne({
-                        "title": {$regex: new RegExp(title, "i")}
+                        title
                     });
                     if(serviceExist) throw new Error('Service already exist');
-                    if (serviceCatId !== undefined){
-                        if(!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid serviceCat ObjectId');
-                        const servicesCat = await ServiceCat.findById(serviceCatId);
-                        if(!servicesCat) throw new Error('serviceCat not found');
-                        servicesCat.services.push(service._id);
-                        await servicesCat.save();
-                    }
+                    if(!serviceCatId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid serviceCat ObjectId');
                     const newService = new Service({
                         title,
                         index: 0,
@@ -71,6 +65,9 @@ module.exports = {
                         createdBy: user._id
                     });
                     let service = await newService.save();
+                    const serviceCat = await ServiceCat.findById(serviceCatId);
+                    serviceCat.services.push(service._id);
+                    await serviceCat.save();
                     await Service.updateMany({
                         serviceCat: serviceCatId
                     }, {
@@ -92,10 +89,7 @@ module.exports = {
                 let service = await Service.findById(serviceId);
                 if(!service) throw new Error('Service not found');
                 const serviceExist = await Service.findOne({
-                    $and: [
-                        {"_id": {$ne: serviceId}},
-                        {"title": {$regex: new RegExp(title, "i")}}
-                    ]
+                    title
                 });
                 if(serviceExist) throw new Error('Service already exist');
                 if(title === service.title) throw new Error('not changed');
@@ -123,7 +117,7 @@ module.exports = {
                 const serviceByCat = await Service.find({
                     serviceCat: {$eq: serviceCatId}
                 });
-                if(index < 0 || index > serviceByCat.length - 1) throw new Error('Index out of range');
+                if(index < 0 || index > serviceByCat.length) throw new Error('Index out of range');
                 if(!service) throw new Error('Service not found');
                 let oldIndex = service.index;
                 let oldServiceCatId = service.serviceCat;
@@ -148,6 +142,7 @@ module.exports = {
                     $inc: {index: 1}
                 });
                 service = await service.save();
+                console.log(oldServiceCatId, serviceCatId)
                 await ServiceCat.findByIdAndUpdate(oldServiceCatId, {
                     $pull: {services: mongoose.Types.ObjectId(serviceId)}
                 });
@@ -164,9 +159,9 @@ module.exports = {
         }, context){
             checkAuth(context);
             try{
-                if (serviceId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                if (!serviceId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
                 const service = await Service.findById(serviceId);
-                if(service) throw new Error('Service not found');
+                if(!service) throw new Error('Service not found');
                 let serviceCatId = service.serviceCat;
                 const index = service.index;
                 await service.delete();
@@ -178,9 +173,10 @@ module.exports = {
                 }, {
                     $inc: {index: -1}
                 });
-                await Service.findOneAndUpdate(serviceCatId, {
-                    $pull: {services: serviceId}
-                });
+                const serviceCat = await ServiceCat.findById(serviceCatId);
+                const newServicesList = serviceCat.services.filter(service => service._id != serviceId);
+                serviceCat.services = newServicesList;
+                await serviceCat.save();
                 return 'Service deleted successfully';
             } catch (err) {
                 throw new Error(err);

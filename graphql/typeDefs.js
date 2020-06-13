@@ -26,7 +26,7 @@ module.exports = gql`
         type: Type
         createdBy: User!
         createdAt: String!
-        thumbnailUrl: Image
+        thumbnail: Image
     }
     type Type {
         _id: ID!
@@ -61,12 +61,10 @@ module.exports = gql`
     type Image {
         _id: ID!
         filename: String!
-        format: String!
-        type: String!
         url: String!
         uploadAt: String!
         uploadBy: User!
-        project: [Project]!
+        project: Project!
     }
     type User {
         _id: ID!
@@ -105,7 +103,6 @@ module.exports = gql`
         title: String
         display: Boolean!
         typeId: ID
-        thumbnailId: ID
     }
     input RegisterInput {
         username: String!
@@ -145,12 +142,12 @@ module.exports = gql`
         editGeneral(generalInput: GeneralInput): General!
         createProject(projectInput: ProjectInput!): Project!
         editProject(projectId: ID!, projectInput: ProjectInput!): Project!
-        moveProject(projectId: ID!, index: String!): String!
+        moveProject(projectId: ID!, index: Int!): String!
         deleteProject(projectId: ID!): String!
         createType(title: String!): Type!
         editType(typeId: ID!, title: String!): Type!
         deleteType(typeId: ID!): String!
-        uploadImage(imageFile: Upload!): String!
+        uploadImage(imageFile: Upload!, projectId: ID!): Image!
         deleteImage(imageId: ID): String!
         createClient(title: String): Client!
         editClient(clientId: ID!, title: String): Client!

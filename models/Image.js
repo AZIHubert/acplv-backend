@@ -12,10 +12,10 @@ const imageSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    project: [{
+    project: {
         type: Schema.Types.ObjectId,
         ref: 'Project'
-    }]
+    }
 });
 
 module.exports = model('Image', imageSchema);

@@ -2,7 +2,7 @@ const Image = require('../../models/Image');
 const Project = require('../../models/Project');
 const checkAuth = require('../../util/checkAuth');
 const cloudinary = require('cloudinary').v2;
-const {userGetter, transformImage} = require('../../util/merge');
+const { transformImage } = require('../../util/merge');
 
 const {
     CLOUDINARY_CLOUD_NAME,
@@ -44,6 +44,7 @@ module.exports = {
     Mutation: {
         async uploadImage(_, {
             imageFile,
+            projectId
         }, context){
             const user = checkAuth(context);
             try {
@@ -64,15 +65,19 @@ module.exports = {
                     });
                     fileStream.pipe(cloudStream);
                 });
-                console.log(file)
                 const newImage = new Image({
                     filename: file.public_id,
                     url: file.url,
+                    project: projectId,
                     uploadAt: file.created_at,
                     uploadBy: user._id
                 });
                 let image = await newImage.save();
-                return image._id
+                image = transformImage(image);
+                await Project.findByIdAndUpdate(projectId, {
+                    $set: {thumbnail: image._id}
+                });
+                return image;
             } catch(err) {
                 throw new Error(err);
             }
@@ -85,22 +90,24 @@ module.exports = {
                 if (!imageId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
                 const image = await Image.findById(imageId);
                 if(!image) throw new Error('Image not found');
-                const imageId = image._id;
-                const imageType = image.type;
-                // TODO: Maybe add folder/filename but in this case, what about upload preset folder ?
-                await cloudinary.uploader.destroy(image.filename, err => {
+                const oldImageId = image._id;
+                await cloudinary.uploader.destroy(image.filenameInvalid,  {
+                    type: "authenticated"
+                },(err, res) => {
                     if(err){
+                        console.log(err);
                         throw new Error(err);
+                    }
+                    if(res){
+                        console.log(res)
                     }
                 });
                 await image.delete();
-                if(imageType === "project"){
-                    await Project.updateMany({
-                        thumbnail: {$eq: imageId}
-                    }, {
-                        thumbnail: null
-                    });
-                }
+                await Project.updateMany({
+                    thumbnail: {$eq: oldImageId}
+                }, {
+                    thumbnail: null
+                });
                 return 'Image deleted successfully';
             } catch(err) {
                 throw new Error(err);

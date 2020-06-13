@@ -74,7 +74,7 @@ const services = async serviceIds => {
                 createdBy: () => userGetter(service.createdBy),
                 serviceCat: () => serviceCatGetter(service.serviceCat)
             }
-        }).sort((a, b) => a.index - b.index);
+        });
         return services;
     } catch(err) {
         throw new Error(err);
@@ -146,7 +146,8 @@ const image = async imageIds => {
             return {
                 ...image._doc,
                 _id: image._id,
-                uploadBy: () => userGetter(image.createdBy)
+                uploadBy: () => userGetter(image.createdBy),
+                projects: () => projectsGetter(image.projects)
             }
         });
         return images;
@@ -172,7 +173,7 @@ const transformProject = project => ({
     _id: project._id,
     createdBy: () => userGetter(project.createdBy),
     type: () => typeGetter(project.type),
-    thumbnail: () => imageGetter(project.thumbnails)
+    thumbnail: () => imageGetter(project.thumbnail)
 });
 const transformType = type => ({
     ...type._doc,
@@ -184,7 +185,7 @@ const transformImage = image => ({
     ...image._doc,
     _id: image._id,
     uploadBy: () => userGetter(image.uploadBy),
-    projects: () => projectsGetter(image.projects)
+    project: () => projectsGetter(image.projects)
 });
 
 module.exports.userGetter = userGetter;

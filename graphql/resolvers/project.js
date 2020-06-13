@@ -1,9 +1,9 @@
 const Project = require('../../models/Project');
 const Type = require('../../models/Type');
-const Image = require('../../models/Image');
 const checkAuth = require('../../util/checkAuth');
 const {transformProject} = require('../../util/merge');
 const mongoose = require('mongoose');
+const { UserInputError } = require('apollo-server-express');
 
 module.exports = {
     Query: {
@@ -35,27 +35,33 @@ module.exports = {
             projectInput: {
                 title,
                 display,
-                typeId,
-                thumbnail: thumbnailId
+                typeId
             }
         }, context){
             const user = checkAuth(context)
+            if(title.trim() === '') throw new UserInputError('Errors', {
+                errors: { title: 'Cant\'t be empty' }
+            });
+            let projects;
             try{
-                if(title.trim() === "" || title === undefined)
-                    throw new Error('Title Can\'t be empty');
-                let thumbnail;
-                let type;
-                if(thumbnailId !== undefined){
-                    if (thumbnailId !== undefined && !thumbnailId.match(/^[0-9a-fA-F]{24}$/))
-                        throw new Error('Invalid thumbnailId ObjectId');
-                    thumbnail = await Image.findById(typeId);
-                    if(!thumbnail) throw new Error('Thumbnail not found');
-                }
-                if(typeId !== undefined){
+                projects = await Project.findOne({
+                    title: {$regex: new RegExp(title, "i")}
+                });
+            } catch(err) {
+                throw new Error(err);
+            }
+            if(projects) throw new UserInputError('Errors', {
+                errors: { title: 'Types already exist' }
+            });
+            let type;
+            try{
+                if(typeId !== undefined && typeId.trim() !== ""){
                     if (typeId !== undefined && !typeId.match(/^[0-9a-fA-F]{24}$/))
                         throw new Error('Invalid type ObjectId');
                     type = await Type.findById(typeId);
                     if(!type) throw new Error('Type not found');
+                } else {
+                    typeId = null
                 }
                 let newProject = new Project({
                     title,
@@ -64,18 +70,14 @@ module.exports = {
                     createdAt: new Date().toISOString(),
                     createdBy: user._id,
                     type: typeId,
-                    thumbnail: thumbnailId
+                    thumbnail: null
                 });
                 
                 await Project.updateMany({
                     $inc: {index: 1}
                 });
                 let project = await newProject.save();
-                if(thumbnailId !== undefined){
-                    thumbnail.projects.push(project._id);
-                    await thumbnail.save();
-                }
-                if(typeId !== undefined){
+                if(typeId !== null){
                     type.projects.push(project._id);
                     await type.save();
                 }
@@ -89,13 +91,10 @@ module.exports = {
             projectInput: {
                 title,
                 display,
-                typeId,
-                thumbnail: thumbnailId
+                typeId
             }
         }, context){
             checkAuth(context);
-            console.log('test')
-            console.log(display)
             try{
                 if (!projectId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid service ObjectId');
                 let project = await Project.findById(projectId);
@@ -103,31 +102,21 @@ module.exports = {
                 const oldTitle = project.title;
                 const oldDisplay = project.display;
                 const oldType = project.type;
-                const oldThumbnail = project.thumbnail;
-                if((title !== undefined && title === oldTitle) &&
-                    (display !== undefined && display === oldDisplay) &&
-                    ((typeId === undefined && oldType === null) ||
-                    (typeId !== undefined && typeId === oldType)) &&
-                    ((thumbnailId === undefined && oldThumbnail === null) ||
-                    (thumbnailId !== undefined && thumbnailId === oldThumbnail)))
-                    throw new Error('Project not changed');
-                project.title = title !== undefined ? title : project.title;
+                typeId = typeId === '' ? null : typeId;
+                project.title = (title !== undefined && title.trim !== '') ? title : project.title;
                 project.display = display !== undefined ? display : project.display;
-                project.type = typeId !== undefined ? typeId : project.type;
-                project.thumbnail = thumbnailId !== undefined ? thumnailId : project.thumbnail;
+                project.type = typeId;
                 project = await project.save();
-                await Type.findByIdAndUpdate(oldType, {
-                    $pull: {projects: mongoose.Types.ObjectId(projectId)}
-                });
-                await Type.findByIdAndUpdate(typeId, {
-                    $push: {projects: projectId}
-                });
-                await Image.findByIdAndUpdate(oldType, {
-                    $pull: {projects: mongoose.Types.ObjectId(projectId)}
-                });
-                await Image.findByIdAndUpdate(typeId, {
-                    $push: {projects: projectId}
-                });
+                if(oldType){
+                    await Type.findByIdAndUpdate(oldType, {
+                        $pull: {projects: mongoose.Types.ObjectId(projectId)}
+                    });
+                }
+                if(project.type){
+                    await Type.findByIdAndUpdate(typeId, {
+                        $push: {projects: projectId}
+                    });
+                }
                 return transformProject(project);
             } catch(err) {
                 throw new Error(err);
@@ -173,24 +162,23 @@ module.exports = {
         }, context){
             checkAuth(context);
             try {
-                if (projectId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
-                const project = await Prohect.findById(projectId);
+                if (!projectId.match(/^[0-9a-fA-F]{24}$/)) throw new Error('Invalid ObjectId');
+                const project = await Project.findById(projectId);
                 if(!project) throw new Error('Project not found');
                 const index = project.index;
-                const typeId = project.type;
-                const thumbnailId = project.thumbnail;
+                const typeId = project.type ? project.type._id : '';
+                const thumbnailId = project.thumbnail ? project.thumbnail._id : '';
                 await project.delete();
                 await Project.updateMany({
                     index: {$gte: index}
                 }, {
                     $inc: {index: -1}
                 });
-                await Type.findByIdAndUpdate(typeId, {
-                    $pull: {projects: typeId}
-                });
-                await Image.findByIdAndUpdate(thumbnailId, {
-                    $pull: {projects: typeId}
-                });
+                if(project.type){
+                    await Type.findByIdAndUpdate(project.type._id, {
+                        $pull: {projects: projectId}
+                    });
+                }
                 return 'ServiceCat deleted successfully';
             } catch (err) {
                 throw new Error(err);
