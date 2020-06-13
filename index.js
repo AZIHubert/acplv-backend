@@ -17,15 +17,13 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     playground: false,
+    cors: true,
     context: ({req}) => ({req})
 });
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors())
-app.use(graphqlEndpoint, bodyParser.json());
-
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, cors: false });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
