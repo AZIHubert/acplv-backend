@@ -18,9 +18,6 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     playground: false,
-    fetchOptions: {
-        mode: 'no-cors',
-    },
     context: ({req}) => ({req})
 });
 const app = express();
