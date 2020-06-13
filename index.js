@@ -4,8 +4,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 
-  
-
 const {
 	MONGODB
 } = require('./config.js');
@@ -23,9 +21,11 @@ const server = new ApolloServer({
 });
 const app = express();
 const port = process.env.PORT || 5000;
-// app.use(graphqlEndpoint, bodyParser.json());
 
-server.applyMiddleware({ app, cors: false });
+app.use(cors())
+app.use(graphqlEndpoint, bodyParser.json());
+
+server.applyMiddleware({ app });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
