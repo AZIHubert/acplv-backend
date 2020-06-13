@@ -28,13 +28,13 @@ const port = process.env.PORT || 5000;
 app.use((req, res, next) => {
     res.header(
       "Access-Control-Allow-Origin",
-      "*"
+      "http://acplv.com"
     );
     next();
 });
 app.use(graphqlEndpoint, bodyParser.json());
 
-server.applyMiddleware({ app, cors: { origin: '*', credentials: true } });
+server.applyMiddleware({ app, cors: { origin: 'http://acplv.com', credentials: true } });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
