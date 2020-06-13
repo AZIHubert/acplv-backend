@@ -2,6 +2,7 @@ const express = require('express');
 const { ApolloServer  } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
 
 const {
@@ -22,7 +23,8 @@ const server = new ApolloServer({
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(graphqlEndpoint, bodyParser.json());
+app.use(bodyParser.json());
+app.use(cors())
 
 server.applyMiddleware({ app });
 
