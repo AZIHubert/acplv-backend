@@ -1,10 +1,14 @@
 const express = require('express');
 const { ApolloServer  } = require('apollo-server-express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
+
 
 const {
 	MONGODB
 } = require('./config.js');
+
+const graphqlEndpoint = '/graphql';
 
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers')
@@ -12,11 +16,13 @@ const resolvers = require('./graphql/resolvers')
 const server = new ApolloServer({
     typeDefs,
     resolvers,
-    playground: true,
+    playground: false,
     context: ({req}) => ({req})
 });
 const app = express();
 const port = process.env.PORT || 5000;
+
+app.use(graphqlEndpoint, bodyParser.json());
 
 server.applyMiddleware({ app });
 
