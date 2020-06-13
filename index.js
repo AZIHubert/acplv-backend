@@ -30,7 +30,7 @@ app.use(cors(corsOptions));
 
 const port = process.env.PORT || 5000;
 
-server.applyMiddleware({ app, cors: false });
+server.applyMiddleware({ app, path: '/', cors: false });
 
 mongoose.connect(MONGODB, {
     useNewUrlParser: true,
