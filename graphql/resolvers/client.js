@@ -153,7 +153,13 @@ module.exports = {
                     $inc: {index: 1}
                 });
                 await client.save();
-                return 'Client move successfully'
+                let editedClients = await Client.find().sort({index: 1});
+                editedClients = editedClients.map(client => ({
+                    ...client._doc,
+                    _id: client._id,
+                    createdBy: userGetter(client.createdBy)
+                }));
+                return editedClients;
             } catch (err) {
                 throw new Error(err);
             }
