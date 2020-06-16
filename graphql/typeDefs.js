@@ -151,7 +151,7 @@ module.exports = gql`
         deleteImage(imageId: ID): String!
         createClient(title: String): Client!
         editClient(clientId: ID!, title: String): Client!
-        moveClient(clientId: ID!, index: Int!): [Client]!
+        moveClient(clientId: ID!, index: Int!): String!
         deleteClient(clientId: ID!): String!
         createServiceCat(title: String!): ServiceCat!
         editServiceCat(serviceCatId: ID!, title: String!): ServiceCat!
