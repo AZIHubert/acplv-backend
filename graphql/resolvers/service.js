@@ -64,7 +64,6 @@ module.exports = {
                         createdAt: new Date().toISOString(),
                         createdBy: user._id
                     });
-                    let service = await newService.save();
                     const serviceCat = await ServiceCat.findById(serviceCatId);
                     serviceCat.services.push(service._id);
                     await serviceCat.save();
@@ -73,6 +72,7 @@ module.exports = {
                     }, {
                         $inc: {index: 1}
                     });
+                    let service = await newService.save();
                     return transformService(service);
                 } catch(err) {
                     throw new Error(err);
