@@ -157,7 +157,7 @@ module.exports = {
                 editedClients = editedClients.map(client => ({
                     ...client._doc,
                     _id: client._id,
-                    createdBy: userGetter(client.createdBy)
+                    createdBy: userGetter(editedClients.createdBy)
                 }));
                 return editedClients;
             } catch (err) {
