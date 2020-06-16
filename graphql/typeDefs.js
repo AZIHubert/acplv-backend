@@ -142,7 +142,7 @@ module.exports = gql`
         editGeneral(generalInput: GeneralInput): General!
         createProject(projectInput: ProjectInput!): Project!
         editProject(projectId: ID!, projectInput: ProjectInput!): Project!
-        moveProject(projectId: ID!, index: Int!): String!
+        moveProject(projectId: ID!, index: Int!): [Project]!
         deleteProject(projectId: ID!): String!
         createType(title: String!): Type!
         editType(typeId: ID!, title: String!): Type!

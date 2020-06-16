@@ -152,7 +152,10 @@ module.exports = {
                     $inc: {index: 1}
                 });
                 await project.save();
-                return 'Project successfully moved';
+                let projects = await Project.find()
+                    .sort({index: 1});
+                projects = projects.map(project => transformProject(project));
+                return projects;
             } catch(err) {
                 throw new Error(err);
             }
